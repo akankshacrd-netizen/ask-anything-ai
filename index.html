@@ -3,180 +3,248 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Ask Anything AI</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
   font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  background:#0b0d10;
-  color:#f4f4f5;
+  background:#09090d;
+  color:#f7f7fa;
   height:100vh;
-  overflow:hidden
+  overflow:hidden;
 }
 
-.app{display:flex;height:100vh}
+.app{
+  display:flex;
+  height:100vh;
+}
+
+/* SIDEBAR */
 
 .sidebar{
   width:270px;
-  background:#111318;
-  border-right:1px solid #252932;
+  background:#111117;
+  border-right:1px solid #292532;
   padding:18px;
   display:flex;
   flex-direction:column;
-  gap:16px
+  gap:16px;
 }
 
-.logo{font-size:20px;font-weight:750;padding:8px 4px}
+.logo{
+  font-size:20px;
+  font-weight:750;
+  padding:8px 4px;
+}
 
 .new{
-  border:1px solid #30343d;
-  background:#191c22;
+  border:1px solid #38313f;
+  background:#19161e;
   color:#fff;
   border-radius:12px;
   padding:12px 14px;
   font-size:14px;
   cursor:pointer;
-  text-align:left
+  text-align:left;
 }
 
-.new:hover{background:#20242b}
+.new:hover{
+  background:#251e2c;
+}
 
-.history{flex:1;overflow:auto}
+.history{
+  flex:1;
+  overflow:auto;
+}
 
 .history h4{
-  color:#8e949f;
+  color:#9993a2;
   font-size:11px;
   text-transform:uppercase;
   letter-spacing:.08em;
-  margin:12px 5px
+  margin:12px 5px;
 }
 
 .chat-item{
   padding:10px;
   border-radius:9px;
-  color:#cfd2d8;
+  color:#d0ccd5;
   font-size:13px;
   cursor:pointer;
   white-space:nowrap;
   overflow:hidden;
-  text-overflow:ellipsis
+  text-overflow:ellipsis;
 }
 
-.chat-item:hover{background:#1b1e24}
+.chat-item:hover{
+  background:#211c26;
+}
 
 .sidebar-footer{
   font-size:12px;
-  color:#777e89;
-  padding:4px
+  color:#77717e;
+  padding:4px;
 }
+
+/* MAIN */
 
 main{
   flex:1;
   display:flex;
   flex-direction:column;
-  min-width:0
+  min-width:0;
 }
 
 .topbar{
   height:60px;
-  border-bottom:1px solid #252932;
+  border-bottom:1px solid #292532;
   display:flex;
   align-items:center;
   justify-content:space-between;
   padding:0 24px;
-  background:#0d0f13
+  background:#0d0c11;
 }
 
-.model{font-weight:650}
+.model{
+  font-weight:650;
+}
 
 .badge{
   font-size:11px;
-  color:#9aa1ad;
-  border:1px solid #30343d;
+  color:#aaa3b3;
+  border:1px solid #39323f;
   border-radius:999px;
-  padding:5px 9px
+  padding:5px 9px;
 }
+
+/* CHAT */
 
 .messages{
   flex:1;
   overflow:auto;
-  padding:30px 16px 150px
+  padding:30px 16px 150px;
 }
 
-.wrap{max-width:850px;margin:auto}
+.wrap{
+  max-width:850px;
+  margin:auto;
+}
 
 .welcome{
   text-align:center;
-  margin:13vh auto 30px
+  margin:13vh auto 30px;
 }
 
 .welcome h1{
   font-size:42px;
   margin:0 0 12px;
-  letter-spacing:-.04em
+  letter-spacing:-.04em;
 }
 
-.welcome p{color:#8e949f;font-size:16px}
+.welcome p{
+  color:#918b99;
+  font-size:16px;
+}
 
 .msg{
   display:flex;
   gap:13px;
   margin:0 auto 25px;
   line-height:1.65;
-  font-size:15px
+  font-size:15px;
 }
 
 .avatar{
   width:30px;
   height:30px;
   border-radius:9px;
-  background:#22262e;
+  background:#24202b;
   display:flex;
   align-items:center;
   justify-content:center;
   font-size:13px;
-  flex:0 0 auto
+  flex:0 0 auto;
 }
 
-.user .avatar{background:#394150}
+.user .avatar{
+  background:#40374a;
+}
 
 .bubble{
   max-width:760px;
   white-space:pre-wrap;
-  word-wrap:break-word
+  word-wrap:break-word;
 }
 
 .user .bubble{
-  background:#171a20;
-  border:1px solid #292e37;
+  background:#18151d;
+  border:1px solid #302a35;
   padding:10px 13px;
-  border-radius:13px
+  border-radius:13px;
 }
+
+/* IMAGES */
 
 .image-message{
-  margin-top:8px;
-  max-width:300px;
-  max-height:300px;
+  margin-top:10px;
+  max-width:320px;
+  max-height:320px;
   border-radius:12px;
-  border:1px solid #343943;
-  display:block
+  border:1px solid #39323f;
+  display:block;
+  object-fit:contain;
 }
 
+/* PDF */
+
+.pdf-card{
+  margin-top:10px;
+  padding:12px;
+  border:1px solid #39323f;
+  background:#17141c;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  max-width:330px;
+}
+
+.pdf-icon{
+  font-size:28px;
+}
+
+.pdf-name{
+  font-size:13px;
+  font-weight:600;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+/* LISTEN */
+
 .voice-button{
-  margin-top:8px;
-  border:1px solid #343943;
-  background:#20242b;
-  color:#fff;
+  margin-top:9px;
+  border:1px solid #39323f;
+  background:#19161e;
+  color:#d8d3dd;
   border-radius:9px;
   padding:6px 10px;
   cursor:pointer;
-  font-size:12px
+  font-size:12px;
 }
 
-.voice-button:hover{background:#292e37}
+.voice-button:hover{
+  background:#27212c;
+}
+
+/* COMPOSER */
 
 .composer-area{
   position:fixed;
@@ -184,22 +252,22 @@ main{
   left:270px;
   right:0;
   padding:18px 20px 24px;
-  background:linear-gradient(transparent,#0b0d10 25%)
+  background:linear-gradient(transparent,#09090d 25%);
 }
 
 .composer{
   max-width:850px;
   margin:auto;
-  background:#15181e;
-  border:1px solid #343943;
+  background:#151219;
+  border:1px solid #39323f;
   border-radius:17px;
   padding:9px 10px;
-  box-shadow:0 8px 35px #0008
+  box-shadow:0 8px 35px #0009;
 }
 
 .composer-row{
   display:flex;
-  align-items:flex-end
+  align-items:flex-end;
 }
 
 .composer textarea{
@@ -212,7 +280,23 @@ main{
   min-height:45px;
   max-height:180px;
   padding:9px;
-  font:inherit
+  font:inherit;
+}
+
+.tool-button{
+  width:42px;
+  height:42px;
+  border:1px solid #39323f;
+  border-radius:12px;
+  background:#211c27;
+  color:#fff;
+  cursor:pointer;
+  font-size:18px;
+  margin-right:7px;
+}
+
+.tool-button:hover{
+  background:#2d2534;
 }
 
 .send{
@@ -223,84 +307,287 @@ main{
   background:#fff;
   color:#111;
   cursor:pointer;
-  font-size:18px
+  font-size:18px;
 }
 
 .send:disabled{
   opacity:.35;
-  cursor:not-allowed
+  cursor:not-allowed;
 }
 
-.action-button{
-  width:42px;
-  height:42px;
-  border:1px solid #343943;
-  border-radius:12px;
-  background:#20242b;
-  color:#fff;
-  cursor:pointer;
-  font-size:18px;
-  margin-right:7px
-}
+/* ATTACHMENTS */
 
-.action-button:hover{background:#292e37}
-
-.mic-active{
-  background:#ffffff;
-  color:#111;
-}
-
-.photo-preview{
+.attachments{
   display:none;
   padding:8px 8px 4px;
-  position:relative
+  gap:8px;
+  flex-wrap:wrap;
 }
 
-.photo-preview img{
-  width:90px;
-  height:90px;
-  object-fit:cover;
+.attachment{
+  position:relative;
+  border:1px solid #39323f;
   border-radius:12px;
-  border:1px solid #343943
+  overflow:hidden;
+  background:#1b1720;
 }
 
-.remove-photo{
+.attachment img{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  display:block;
+}
+
+.pdf-preview{
+  width:180px;
+  padding:10px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.remove-attachment{
   position:absolute;
-  left:85px;
-  top:2px;
-  width:24px;
-  height:24px;
+  right:4px;
+  top:4px;
+  width:22px;
+  height:22px;
   border:0;
   border-radius:50%;
   background:#fff;
   color:#111;
   cursor:pointer;
-  font-weight:bold
+  font-weight:bold;
 }
 
 .hint{
   text-align:center;
-  color:#666d77;
+  color:#66606d;
   font-size:11px;
-  margin-top:8px
+  margin-top:8px;
 }
 
-.typing{color:#8e949f}
+/* TYPING */
 
-.dot{animation:blink 1s infinite}
-.dot:nth-child(2){animation-delay:.2s}
-.dot:nth-child(3){animation-delay:.4s}
+.typing{
+  color:#928c99;
+}
+
+.dot{
+  animation:blink 1s infinite;
+}
+
+.dot:nth-child(2){
+  animation-delay:.2s;
+}
+
+.dot:nth-child(3){
+  animation-delay:.4s;
+}
 
 @keyframes blink{
-  50%{opacity:.2}
+  50%{
+    opacity:.2;
+  }
 }
 
+/* VOICE MODE */
+
+.voice-overlay{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(
+      circle at center,
+      #20152e 0%,
+      #0b0910 38%,
+      #050507 100%
+    );
+  z-index:100;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+
+.voice-overlay.active{
+  display:flex;
+}
+
+.voice-title{
+  position:absolute;
+  top:35px;
+  font-size:17px;
+  font-weight:650;
+}
+
+.voice-status{
+  position:absolute;
+  top:67px;
+  color:#9d96a7;
+  font-size:13px;
+}
+
+/* PURPLE + WHITE GLOBE */
+
+.voice-globe{
+  width:270px;
+  height:270px;
+  border-radius:50%;
+  position:relative;
+
+  background:
+    radial-gradient(
+      circle at 35% 28%,
+      #ffffff 0%,
+      #f4eaff 14%,
+      #d8baff 31%,
+      #9b4dff 53%,
+      #5c16a8 72%,
+      #210735 100%
+    );
+
+  box-shadow:
+    0 0 35px #b66aff,
+    0 0 80px #8a35d966,
+    inset -30px -25px 55px #26063e,
+    inset 20px 15px 40px #ffffffaa;
+
+  animation:globeFloat 4s ease-in-out infinite;
+}
+
+.voice-globe:before,
+.voice-globe:after{
+  content:"";
+  position:absolute;
+  inset:-15px;
+  border-radius:50%;
+  border:2px solid #dcb7ff55;
+  animation:orbit 6s linear infinite;
+}
+
+.voice-globe:after{
+  inset:-28px;
+  border-color:#ffffff22;
+  animation-duration:9s;
+  animation-direction:reverse;
+}
+
+.voice-globe.listening{
+  animation:globeListen 1.4s ease-in-out infinite;
+}
+
+.voice-globe.speaking{
+  animation:globeSpeak .9s ease-in-out infinite;
+}
+
+@keyframes globeFloat{
+
+  0%,100%{
+    transform:translateY(0) scale(1);
+  }
+
+  50%{
+    transform:translateY(-10px) scale(1.025);
+  }
+}
+
+@keyframes globeListen{
+
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.08);
+  }
+}
+
+@keyframes globeSpeak{
+
+  0%,100%{
+    transform:scale(1);
+  }
+
+  50%{
+    transform:scale(1.12);
+  }
+}
+
+@keyframes orbit{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+/* VOICE BUTTONS */
+
+.voice-controls{
+  position:absolute;
+  bottom:50px;
+  display:flex;
+  gap:18px;
+}
+
+.voice-control{
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  border:1px solid #ffffff25;
+  background:#ffffff12;
+  color:#fff;
+  cursor:pointer;
+  font-size:23px;
+  backdrop-filter:blur(12px);
+}
+
+.voice-control:hover{
+  background:#ffffff22;
+}
+
+.voice-control.mic{
+  background:#fff;
+  color:#17121d;
+}
+
+.voice-help{
+  position:absolute;
+  bottom:120px;
+  color:#77717f;
+  font-size:12px;
+}
+
+/* MOBILE */
+
 @media(max-width:700px){
-  .sidebar{display:none}
-  .composer-area{left:0}
-  .topbar{padding:0 16px}
-  .welcome h1{font-size:32px}
-  .messages{padding-left:12px;padding-right:12px}
+
+  .sidebar{
+    display:none;
+  }
+
+  .composer-area{
+    left:0;
+  }
+
+  .topbar{
+    padding:0 16px;
+  }
+
+  .welcome h1{
+    font-size:32px;
+  }
+
+  .messages{
+    padding-left:12px;
+    padding-right:12px;
+  }
+
+  .voice-globe{
+    width:220px;
+    height:220px;
+  }
+
 }
 </style>
 </head>
@@ -311,761 +598,1057 @@ main{
 
 <aside class="sidebar">
 
-  <div class="logo">✦ Ask Anything AI</div>
+  <div class="logo">
+    ✦ Ask Anything AI
+  </div>
 
-  <button class="new" onclick="newChat()">＋ New chat</button>
+  <button
+    class="new"
+    onclick="newChat()"
+  >
+    ＋ New chat
+  </button>
 
   <div class="history">
+
     <h4>Recent chats</h4>
+
     <div id="history"></div>
+
   </div>
 
   <div class="sidebar-footer">
-    Your AI assistant · Voice · Vision
+    Your AI assistant
   </div>
 
 </aside>
 
 <main>
 
-  <header class="topbar">
-    <div class="model">
-      Ask Anything <span class="badge">AI</span>
-    </div>
+<header class="topbar">
 
-    <div class="badge" id="status">
-      Connected
-    </div>
-  </header>
+  <div class="model">
+    Ask Anything
+    <span class="badge">AI</span>
+  </div>
 
-  <section class="messages" id="messages">
-    <div class="wrap" id="chat"></div>
-  </section>
+  <div
+    class="badge"
+    id="status"
+  >
+    Connected
+  </div>
 
-  <div class="composer-area">
+</header>
 
-    <div class="composer">
+<section
+  class="messages"
+  id="messages"
+>
 
-      <div class="photo-preview" id="photoPreview">
-        <img id="previewImage" alt="Selected photo">
-        <button class="remove-photo" onclick="removePhoto()">×</button>
-      </div>
+  <div
+    class="wrap"
+    id="chat"
+  ></div>
 
-      <div class="composer-row">
+</section>
 
-        <textarea
-          id="input"
-          rows="1"
-          placeholder="Ask anything…"
-        ></textarea>
+<div class="composer-area">
 
-        <input
-          id="imageInput"
-          type="file"
-          accept="image/*"
-          style="display:none"
-          onchange="handleImage(event)"
-        >
+  <div class="composer">
 
-        <button
-          type="button"
-          class="action-button"
-          id="micButton"
-          onclick="toggleMic()"
-          title="Speak"
-        >
-          🎙️
-        </button>
+    <div
+      class="attachments"
+      id="attachments"
+    ></div>
 
-        <button
-          type="button"
-          class="action-button"
-          onclick="document.getElementById('imageInput').click()"
-          title="Upload photo"
-        >
-          📷
-        </button>
+    <div class="composer-row">
 
-        <button
-          class="send"
-          id="send"
-          onclick="sendMessage()"
-        >
-          ↑
-        </button>
+      <textarea
+        id="input"
+        rows="1"
+        placeholder="Ask anything…"
+      ></textarea>
 
-      </div>
+      <input
+        id="imageInput"
+        type="file"
+        accept="image/*"
+        multiple
+        hidden
+      >
 
-    </div>
+      <input
+        id="pdfInput"
+        type="file"
+        accept="application/pdf"
+        hidden
+      >
 
-    <div class="hint">
-      🎙️ Speak · 📷 Upload photo · Enter to send · Shift+Enter for new line
+      <button
+        class="tool-button"
+        type="button"
+        onclick="openImagePicker()"
+        title="Attach photo"
+      >
+        📷
+      </button>
+
+      <button
+        class="tool-button"
+        type="button"
+        onclick="openPdfPicker()"
+        title="Attach PDF"
+      >
+        📄
+      </button>
+
+      <button
+        class="tool-button"
+        type="button"
+        onclick="openVoiceMode()"
+        title="Voice mode"
+      >
+        🎙️
+      </button>
+
+      <button
+        class="send"
+        id="send"
+        onclick="sendMessage()"
+      >
+        ↑
+      </button>
+
     </div>
 
   </div>
+
+  <div class="hint">
+    Enter to send · Shift+Enter for a new line · 📷 Photo · 📄 PDF · 🎙️ Voice
+  </div>
+
+</div>
 
 </main>
 
 </div>
 
+
+<!-- VOICE SCREEN -->
+
+<div
+  class="voice-overlay"
+  id="voiceOverlay"
+>
+
+  <div class="voice-title">
+    Ask Anything AI
+  </div>
+
+  <div
+    class="voice-status"
+    id="voiceStatus"
+  >
+    Tap the microphone
+  </div>
+
+  <div
+    class="voice-globe"
+    id="voiceGlobe"
+  ></div>
+
+  <div class="voice-help">
+    Speak naturally in English
+  </div>
+
+  <div class="voice-controls">
+
+    <button
+      class="voice-control"
+      onclick="closeVoiceMode()"
+      title="Close"
+    >
+      ×
+    </button>
+
+    <button
+      class="voice-control mic"
+      id="voiceMic"
+      onclick="toggleListening()"
+      title="Microphone"
+    >
+      🎙️
+    </button>
+
+    <button
+      class="voice-control"
+      onclick="stopSpeaking()"
+      title="Stop speaking"
+    >
+      ■
+    </button>
+
+  </div>
+
+</div>
+
+
 <script>
 
-const chat = document.getElementById('chat');
-const input = document.getElementById('input');
-const send = document.getElementById('send');
-const imageInput = document.getElementById('imageInput');
-const photoPreview = document.getElementById('photoPreview');
-const previewImage = document.getElementById('previewImage');
-const micButton = document.getElementById('micButton');
+const chat =
+  document.getElementById("chat");
+
+const input =
+  document.getElementById("input");
+
+const send =
+  document.getElementById("send");
+
+const imageInput =
+  document.getElementById("imageInput");
+
+const pdfInput =
+  document.getElementById("pdfInput");
+
+const attachments =
+  document.getElementById("attachments");
+
+const voiceOverlay =
+  document.getElementById("voiceOverlay");
+
+const voiceGlobe =
+  document.getElementById("voiceGlobe");
+
+const voiceStatus =
+  document.getElementById("voiceStatus");
+
 
 let messages = [];
 
 let chats = JSON.parse(
-  localStorage.getItem('ask-anything-chats') || '[]'
+  localStorage.getItem(
+    "ask-anything-chats"
+  ) || "[]"
 );
 
-let selectedImage = null;
+let selectedFiles = [];
+
 let recognition = null;
-let isListening = false;
+
+let listening = false;
 
 
-/* -------------------------
-   HISTORY
-------------------------- */
-
-function renderHistory(){
-
-  document.getElementById('history').innerHTML =
-    chats
-      .slice(-12)
-      .reverse()
-      .map((x,i)=>
-        `<div class="chat-item"
-        onclick="loadChat(${chats.length-1-i})">
-        ${escapeHtml(x.title)}
-        </div>`
-      )
-      .join('');
-}
-
-
-/* -------------------------
-   SECURITY
-------------------------- */
+/* SECURITY */
 
 function escapeHtml(s){
 
   return String(s).replace(
     /[&<>"']/g,
     m => ({
-      '&':'&amp;',
-      '<':'&lt;',
-      '>':'&gt;',
-      '"':'&quot;',
-      "'":'&#039;'
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
     }[m])
   );
 
 }
 
 
-/* -------------------------
-   NEW CHAT
-------------------------- */
+/* HISTORY */
+
+function renderHistory(){
+
+  document.getElementById(
+    "history"
+  ).innerHTML =
+
+    chats
+      .slice(-12)
+      .reverse()
+      .map((x,i)=>
+
+        `<div
+          class="chat-item"
+          onclick="loadChat(${chats.length-1-i})"
+        >
+          ${escapeHtml(x.title)}
+        </div>`
+
+      )
+      .join("");
+
+}
+
+
+/* NEW CHAT */
 
 function newChat(){
 
   messages = [];
 
-  selectedImage = null;
+  selectedFiles = [];
 
-  stopSpeaking();
-
-  removePhoto();
+  renderAttachments();
 
   chat.innerHTML = `
+
     <div class="welcome">
-      <h1>What can I help you with?</h1>
+
+      <h1>
+        What can I help you with?
+      </h1>
+
       <p>
-        Ask questions, speak naturally, or upload a photo for help.
+        Ask anything, upload a photo or PDF,
+        or talk with your AI assistant.
       </p>
+
     </div>
+
   `;
 
 }
 
 
-/* -------------------------
-   IMAGE UPLOAD
-------------------------- */
+/* IMAGE PICKER */
 
-function handleImage(event){
+function openImagePicker(){
 
-  const file = event.target.files[0];
-
-  if(!file) return;
-
-  if(!file.type.startsWith('image/')){
-
-    alert('Please select an image.');
-
-    return;
-  }
-
-  if(file.size > 10 * 1024 * 1024){
-
-    alert('Please choose an image smaller than 10 MB.');
-
-    imageInput.value = '';
-
-    return;
-  }
-
-  const reader = new FileReader();
-
-  reader.onload = function(e){
-
-    selectedImage = e.target.result;
-
-    previewImage.src = selectedImage;
-
-    photoPreview.style.display = 'block';
-
-  };
-
-  reader.readAsDataURL(file);
+  imageInput.click();
 
 }
 
 
-/* -------------------------
-   REMOVE IMAGE
-------------------------- */
+/* PDF PICKER */
 
-function removePhoto(){
+function openPdfPicker(){
 
-  selectedImage = null;
-
-  previewImage.src = '';
-
-  photoPreview.style.display = 'none';
-
-  imageInput.value = '';
+  pdfInput.click();
 
 }
 
 
-/* -------------------------
-   VOICE INPUT
-------------------------- */
+/* FILE TO DATA */
 
-function setupSpeechRecognition(){
+function fileToDataURL(file){
 
-  const SpeechRecognition =
-    window.SpeechRecognition ||
-    window.webkitSpeechRecognition;
+  return new Promise(
+    (resolve,reject)=>{
 
-  if(!SpeechRecognition){
+      const reader =
+        new FileReader();
 
-    micButton.title =
-      'Speech recognition is not supported in this browser';
+      reader.onload =
+        () => resolve(reader.result);
 
-    return;
-  }
+      reader.onerror =
+        reject;
 
-  recognition = new SpeechRecognition();
+      reader.readAsDataURL(file);
 
-  recognition.continuous = false;
+    }
+  );
 
-  recognition.interimResults = true;
+}
 
-  recognition.lang = 'en-IN';
 
-  recognition.onstart = function(){
+/* IMAGE UPLOAD */
 
-    isListening = true;
+imageInput.addEventListener(
+  "change",
+  async function(){
 
-    micButton.classList.add('mic-active');
-
-    micButton.textContent = '⏹️';
-
-    document.getElementById('status').textContent =
-      'Listening...';
-
-  };
-
-  recognition.onresult = function(event){
-
-    let transcript = '';
+    const files =
+      Array.from(
+        this.files || []
+      );
 
     for(
-      let i = event.resultIndex;
-      i < event.results.length;
-      i++
+      const file of files
     ){
 
-      transcript +=
-        event.results[i][0].transcript;
+      if(
+        !file.type.startsWith(
+          "image/"
+        )
+      ){
+
+        alert(
+          "Please select an image."
+        );
+
+        continue;
+
+      }
+
+      if(
+        file.size >
+        10 * 1024 * 1024
+      ){
+
+        alert(
+          file.name +
+          " is larger than 10 MB."
+        );
+
+        continue;
+
+      }
+
+      const data =
+        await fileToDataURL(file);
+
+      selectedFiles.push({
+
+        type:"image",
+
+        name:file.name,
+
+        mime:file.type,
+
+        data:data
+
+      });
 
     }
 
-    input.value = transcript;
+    renderAttachments();
 
-    input.style.height = 'auto';
+    this.value="";
 
-    input.style.height =
-      Math.min(input.scrollHeight,180) + 'px';
-
-  };
-
-  recognition.onerror = function(event){
-
-    console.error('Speech recognition error:',event.error);
-
-    document.getElementById('status').textContent =
-      'Voice error';
-
-    stopMic();
-
-  };
-
-  recognition.onend = function(){
-
-    stopMic();
-
-    document.getElementById('status').textContent =
-      'Connected';
-
-  };
-
-}
-
-
-function toggleMic(){
-
-  if(!recognition){
-
-    alert(
-      'Voice input is not supported by this browser. Try Chrome or Android Chrome.'
-    );
-
-    return;
   }
+);
 
-  if(isListening){
 
-    recognition.stop();
+/* PDF UPLOAD */
 
-  }else{
+pdfInput.addEventListener(
+  "change",
+  async function(){
 
-    try{
+    const file =
+      this.files[0];
 
-      recognition.start();
+    if(!file){
+      return;
+    }
 
-    }catch(error){
+    if(
+      file.type !==
+      "application/pdf"
+    ){
 
-      console.error(error);
+      alert(
+        "Please select a PDF file."
+      );
+
+      this.value="";
+
+      return;
 
     }
 
-  }
+    if(
+      file.size >
+      20 * 1024 * 1024
+    ){
 
-}
+      alert(
+        "Please choose a PDF smaller than 20 MB."
+      );
 
+      this.value="";
 
-function stopMic(){
-
-  isListening = false;
-
-  micButton.classList.remove('mic-active');
-
-  micButton.textContent = '🎙️';
-
-}
-
-
-/* -------------------------
-   VOICE OUTPUT
-------------------------- */
-
-function speakText(text,button){
-
-  if(!('speechSynthesis' in window)){
-
-    alert(
-      'Voice output is not supported by this browser.'
-    );
-
-    return;
-  }
-
-  speechSynthesis.cancel();
-
-  if(button){
-
-    button.textContent = '⏹️ Stop';
-
-  }
-
-  const utterance =
-    new SpeechSynthesisUtterance(text);
-
-  utterance.lang = 'en-IN';
-
-  utterance.rate = 1;
-
-  utterance.pitch = 1;
-
-  utterance.onend = function(){
-
-    if(button){
-
-      button.textContent = '🔊 Listen';
+      return;
 
     }
 
-  };
+    const data =
+      await fileToDataURL(file);
 
-  utterance.onerror = function(){
+    selectedFiles.push({
 
-    if(button){
+      type:"pdf",
 
-      button.textContent = '🔊 Listen';
+      name:file.name,
 
-    }
+      mime:"application/pdf",
 
-  };
-
-  speechSynthesis.speak(utterance);
-
-}
-
-
-function stopSpeaking(){
-
-  if('speechSynthesis' in window){
-
-    speechSynthesis.cancel();
-
-  }
-
-  document
-    .querySelectorAll('.voice-button')
-    .forEach(button => {
-
-      button.textContent = '🔊 Listen';
+      data:data
 
     });
 
+    renderAttachments();
+
+    this.value="";
+
+  }
+);
+
+
+/* REMOVE FILE */
+
+function removeAttachment(index){
+
+  selectedFiles.splice(
+    index,
+    1
+  );
+
+  renderAttachments();
+
 }
 
 
-/* -------------------------
-   ADD MESSAGE
-------------------------- */
+/* SHOW ATTACHMENTS */
 
-function addMessage(role,text,image=null){
+function renderAttachments(){
 
-  if(document.querySelector('.welcome')){
+  if(
+    !selectedFiles.length
+  ){
 
-    chat.innerHTML='';
+    attachments.style.display =
+      "none";
 
-  }
+    attachments.innerHTML =
+      "";
 
-  const el = document.createElement('div');
-
-  el.className = 'msg ' + role;
-
-  let imageHtml = '';
-
-  if(image){
-
-    imageHtml =
-      `<img class="image-message"
-      src="${image}"
-      alt="Uploaded photo">`;
+    return;
 
   }
 
-  let voiceHtml = '';
+  attachments.style.display =
+    "flex";
 
-  if(role === 'assistant'){
+  attachments.innerHTML =
 
-    const voiceId =
-      'voice-' + Date.now() + '-' +
-      Math.random().toString(36).slice(2);
+    selectedFiles
+      .map(
+        (file,index)=>{
 
-    voiceHtml =
-      `<button
-        class="voice-button"
-        id="${voiceId}"
-        onclick="speakText(
-          ${JSON.stringify(text).replace(/</g,'\\u003c')},
-          this
-        )">
-        🔊 Listen
-      </button>`;
+          if(
+            file.type ===
+            "image"
+          ){
+
+            return `
+
+              <div class="attachment">
+
+                <img
+                  src="${file.data}"
+                  alt="Selected photo"
+                >
+
+                <button
+                  class="remove-attachment"
+                  onclick="removeAttachment(${index})"
+                >
+                  ×
+                </button>
+
+              </div>
+
+            `;
+
+          }
+
+          return `
+
+            <div class="attachment">
+
+              <div class="pdf-preview">
+
+                <div class="pdf-icon">
+                  📄
+                </div>
+
+                <div class="pdf-name">
+                  ${escapeHtml(file.name)}
+                </div>
+
+              </div>
+
+              <button
+                class="remove-attachment"
+                onclick="removeAttachment(${index})"
+              >
+                ×
+              </button>
+
+            </div>
+
+          `;
+
+        }
+      )
+      .join("");
+
+}
+
+
+/* ADD MESSAGE */
+
+function addMessage(
+  role,
+  text,
+  files=[]
+){
+
+  if(
+    document.querySelector(
+      ".welcome"
+    )
+  ){
+
+    chat.innerHTML =
+      "";
 
   }
+
+  const el =
+    document.createElement(
+      "div"
+    );
+
+  el.className =
+    "msg " + role;
+
+  let filesHtml =
+    "";
+
+  files.forEach(
+    file=>{
+
+      if(
+        file.type ===
+        "image"
+      ){
+
+        filesHtml += `
+
+          <img
+            class="image-message"
+            src="${file.data}"
+            alt="Uploaded photo"
+          >
+
+        `;
+
+      }
+      else{
+
+        filesHtml += `
+
+          <div class="pdf-card">
+
+            <div class="pdf-icon">
+              📄
+            </div>
+
+            <div class="pdf-name">
+              ${escapeHtml(file.name)}
+            </div>
+
+          </div>
+
+        `;
+
+      }
+
+    }
+  );
 
   el.innerHTML = `
+
     <div class="avatar">
-      ${role === 'user' ? 'You' : '✦'}
+      ${role === "user" ? "You" : "✦"}
     </div>
 
     <div class="bubble">
+
       ${escapeHtml(text)}
-      ${imageHtml}
-      ${voiceHtml}
+
+      ${filesHtml}
+
     </div>
+
   `;
+
+
+  /* LISTEN BUTTON */
+
+  if(
+    role ===
+    "assistant"
+  ){
+
+    const voiceButton =
+      document.createElement(
+        "button"
+      );
+
+    voiceButton.className =
+      "voice-button";
+
+    voiceButton.textContent =
+      "🔊 Listen";
+
+    voiceButton.onclick =
+      () => speakText(text);
+
+    el
+      .querySelector(
+        ".bubble"
+      )
+      .appendChild(
+        voiceButton
+      );
+
+  }
+
 
   chat.appendChild(el);
 
-  document.getElementById('messages').scrollTop =
+  document.getElementById(
+    "messages"
+  ).scrollTop =
     999999;
 
 }
 
 
-/* -------------------------
-   SEND MESSAGE
-------------------------- */
+/* SEND MESSAGE */
 
 async function sendMessage(){
 
-  const text = input.value.trim();
+  const text =
+    input.value.trim();
 
   if(
-    (!text && !selectedImage) ||
+    (!text &&
+    !selectedFiles.length)
+    ||
     send.disabled
-  ) return;
+  ){
 
-  stopSpeaking();
+    return;
 
-  const imageToSend = selectedImage;
+  }
 
-  input.value = '';
+  const filesToSend =
+    [...selectedFiles];
 
-  input.style.height = 'auto';
+  input.value =
+    "";
+
+  input.style.height =
+    "auto";
+
 
   const userMessage = {
 
-    role:'user',
+    role:"user",
 
     content:
-      text || 'Please analyze this image.',
+      text ||
+      "Please analyze the attached file.",
 
-    image:
-      imageToSend || null
+    attachments:
+      filesToSend
 
   };
 
-  messages.push(userMessage);
 
-  addMessage(
-    'user',
-    userMessage.content,
-    imageToSend
+  messages.push(
+    userMessage
   );
 
-  removePhoto();
 
-  send.disabled = true;
+  addMessage(
+    "user",
+    userMessage.content,
+    filesToSend
+  );
+
+
+  selectedFiles = [];
+
+  renderAttachments();
+
+  send.disabled =
+    true;
+
 
   const typing =
-    document.createElement('div');
+    document.createElement(
+      "div"
+    );
 
   typing.className =
-    'msg assistant';
+    "msg assistant";
 
   typing.innerHTML = `
-    <div class="avatar">✦</div>
+
+    <div class="avatar">
+      ✦
+    </div>
 
     <div class="bubble typing">
+
       Thinking
-      <span class="dot">•</span>
-      <span class="dot">•</span>
-      <span class="dot">•</span>
+
+      <span class="dot">
+        •
+      </span>
+
+      <span class="dot">
+        •
+      </span>
+
+      <span class="dot">
+        •
+      </span>
+
     </div>
+
   `;
 
-  chat.appendChild(typing);
+  chat.appendChild(
+    typing
+  );
 
-  document
-    .getElementById('messages')
-    .scrollTop = 999999;
 
   try{
 
-    const r = await fetch(
-      '/api/chat',
-      {
-        method:'POST',
+    const response =
+      await fetch(
+        "/api/chat",
+        {
 
-        headers:{
-          'Content-Type':
-            'application/json'
-        },
+          method:"POST",
 
-        body:JSON.stringify({
-          messages:messages
-        })
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
 
-      }
-    );
+          body:
+            JSON.stringify({
+              messages:
+                messages
+            })
 
-    if(!r.ok){
+        }
+      );
+
+
+    if(
+      !response.ok
+    ){
 
       throw new Error(
-        'Backend error'
+        "Backend error"
       );
 
     }
 
+
     const data =
-      await r.json();
+      await response.json();
+
 
     typing.remove();
+
 
     const answer =
       data.answer ||
-      'No answer returned.';
+      "No answer returned.";
+
 
     messages.push({
 
-      role:'assistant',
+      role:"assistant",
 
-      content:answer
+      content:
+        answer
 
     });
 
+
     addMessage(
-      'assistant',
+      "assistant",
       answer
     );
 
+
     saveChat(
-      text || 'Photo question'
+      text ||
+      filesToSend[0]?.name ||
+      "New conversation"
     );
 
-    document
-      .getElementById('status')
-      .textContent =
-      'Connected';
+
+    document.getElementById(
+      "status"
+    ).textContent =
+      "Connected";
+
 
   }
+  catch(error){
 
-  catch(e){
+    console.error(
+      error
+    );
+
 
     typing.remove();
 
+
     const errorMessage =
-      'Sorry, I could not process your request right now.';
+      "Sorry, I could not process your request right now.";
+
 
     messages.push({
 
-      role:'assistant',
+      role:"assistant",
 
-      content:errorMessage
+      content:
+        errorMessage
 
     });
 
+
     addMessage(
-      'assistant',
+      "assistant",
       errorMessage
     );
 
-    document
-      .getElementById('status')
-      .textContent =
-      'Connection error';
 
-    console.error(e);
+    document.getElementById(
+      "status"
+    ).textContent =
+      "Connection error";
 
   }
 
-  send.disabled = false;
+
+  send.disabled =
+    false;
 
   input.focus();
 
 }
 
 
-/* -------------------------
-   SAVE CHAT
-------------------------- */
+/* SAVE HISTORY */
 
 function saveChat(first){
 
-  if(!messages.length)
+  if(
+    !messages.length
+  ){
+
     return;
+
+  }
+
+
+  /*
+    Don't save large attachment
+    data inside localStorage.
+  */
+
+  const historyMessages =
+    messages.map(
+      m => ({
+
+        role:m.role,
+
+        content:m.content
+
+      })
+    );
+
 
   chats.push({
 
-    title:first.slice(0,42),
+    title:
+      first.slice(0,42),
 
-    messages:messages
+    messages:
+      historyMessages
 
   });
+
 
   chats =
     chats.slice(-20);
 
+
   localStorage.setItem(
-    'ask-anything-chats',
+    "ask-anything-chats",
     JSON.stringify(chats)
   );
+
 
   renderHistory();
 
 }
 
 
-/* -------------------------
-   LOAD CHAT
-------------------------- */
+/* LOAD CHAT */
 
 function loadChat(i){
 
-  const c = chats[i];
+  const c =
+    chats[i];
 
-  if(!c) return;
+  if(!c){
+    return;
+  }
+
 
   messages =
     c.messages || [];
 
-  chat.innerHTML = '';
 
-  messages.forEach(m => {
+  chat.innerHTML =
+    "";
 
-    addMessage(
 
-      m.role === 'user'
-        ? 'user'
-        : 'assistant',
+  messages.forEach(
+    m=>{
 
-      m.content,
+      addMessage(
 
-      m.image || null
+        m.role === "user"
+          ? "user"
+          : "assistant",
 
-    );
+        m.content
 
-  });
+      );
+
+    }
+  );
 
 }
 
 
-/* -------------------------
-   ENTER TO SEND
-------------------------- */
+/* ENTER TO SEND */
 
 input.addEventListener(
-  'keydown',
-  e => {
+  "keydown",
+  e=>{
 
     if(
-      e.key === 'Enter' &&
+      e.key === "Enter" &&
       !e.shiftKey
     ){
 
@@ -1079,32 +1662,444 @@ input.addEventListener(
 );
 
 
-/* -------------------------
-   AUTO RESIZE
-------------------------- */
+/* AUTO RESIZE */
 
 input.addEventListener(
-  'input',
-  () => {
+  "input",
+  ()=>{
 
     input.style.height =
-      'auto';
+      "auto";
 
     input.style.height =
       Math.min(
         input.scrollHeight,
         180
-      ) + 'px';
+      ) + "px";
 
   }
 );
 
 
-/* -------------------------
-   START
-------------------------- */
+/* VOICE MODE */
 
-setupSpeechRecognition();
+function openVoiceMode(){
+
+  voiceOverlay.classList.add(
+    "active"
+  );
+
+  voiceStatus.textContent =
+    "Tap the microphone";
+
+  voiceGlobe.classList.remove(
+    "listening",
+    "speaking"
+  );
+
+}
+
+
+function closeVoiceMode(){
+
+  stopListening();
+
+  stopSpeaking();
+
+  voiceOverlay.classList.remove(
+    "active"
+  );
+
+  voiceGlobe.classList.remove(
+    "listening",
+    "speaking"
+  );
+
+}
+
+
+/* SPEECH RECOGNITION */
+
+function setupRecognition(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+
+  if(
+    !SpeechRecognition
+  ){
+
+    alert(
+      "Voice recognition is not supported by this browser."
+    );
+
+    return null;
+
+  }
+
+
+  const r =
+    new SpeechRecognition();
+
+
+  r.lang =
+    "en-US";
+
+  r.continuous =
+    false;
+
+  r.interimResults =
+    false;
+
+  r.maxAlternatives =
+    1;
+
+
+  r.onstart =
+    ()=>{
+
+      listening =
+        true;
+
+      voiceStatus.textContent =
+        "Listening…";
+
+      voiceGlobe.classList.add(
+        "listening"
+      );
+
+    };
+
+
+  r.onresult =
+    event=>{
+
+      const text =
+        event
+          .results[0][0]
+          .transcript;
+
+
+      input.value =
+        text;
+
+
+      input.dispatchEvent(
+        new Event("input")
+      );
+
+
+      voiceStatus.textContent =
+        "Sending…";
+
+
+      stopListening();
+
+      closeVoiceMode();
+
+      sendMessage();
+
+    };
+
+
+  r.onerror =
+    event=>{
+
+      console.error(
+        "Speech recognition error:",
+        event.error
+      );
+
+
+      listening =
+        false;
+
+
+      voiceGlobe.classList.remove(
+        "listening"
+      );
+
+
+      voiceStatus.textContent =
+        "Tap the microphone";
+
+    };
+
+
+  r.onend =
+    ()=>{
+
+      listening =
+        false;
+
+      voiceGlobe.classList.remove(
+        "listening"
+      );
+
+    };
+
+
+  return r;
+
+}
+
+
+function toggleListening(){
+
+  if(listening){
+
+    stopListening();
+
+    return;
+
+  }
+
+
+  recognition =
+    setupRecognition();
+
+
+  if(!recognition){
+    return;
+  }
+
+
+  try{
+
+    recognition.start();
+
+  }
+  catch(error){
+
+    console.error(
+      error
+    );
+
+  }
+
+}
+
+
+function stopListening(){
+
+  if(
+    recognition &&
+    listening
+  ){
+
+    try{
+
+      recognition.stop();
+
+    }
+    catch(e){}
+
+  }
+
+
+  listening =
+    false;
+
+
+  voiceGlobe.classList.remove(
+    "listening"
+  );
+
+}
+
+
+/* MALE ENGLISH VOICE */
+
+function getPreferredVoice(){
+
+  const voices =
+    speechSynthesis.getVoices();
+
+
+  const english =
+    voices.filter(
+      v =>
+        /^en(-|_)/i.test(
+          v.lang
+        )
+    );
+
+
+  if(
+    !english.length
+  ){
+
+    return null;
+
+  }
+
+
+  const preferredNames = [
+
+    "Daniel",
+    "Alex",
+    "Aaron",
+    "Arthur",
+    "Google UK English Male",
+    "Microsoft David",
+    "Microsoft Mark",
+    "Microsoft Guy"
+
+  ];
+
+
+  for(
+    const name of
+    preferredNames
+  ){
+
+    const found =
+      english.find(
+        v =>
+          v.name
+            .toLowerCase()
+            .includes(
+              name.toLowerCase()
+            )
+      );
+
+
+    if(found){
+
+      return found;
+
+    }
+
+  }
+
+
+  return english[0];
+
+}
+
+
+/* SPEAK AI ANSWER */
+
+function speakText(text){
+
+  if(
+    !("speechSynthesis" in window)
+  ){
+
+    return;
+
+  }
+
+
+  speechSynthesis.cancel();
+
+
+  const utterance =
+    new SpeechSynthesisUtterance(
+      text
+    );
+
+
+  utterance.lang =
+    "en-US";
+
+
+  utterance.rate =
+    0.98;
+
+
+  utterance.pitch =
+    0.85;
+
+
+  const voice =
+    getPreferredVoice();
+
+
+  if(voice){
+
+    utterance.voice =
+      voice;
+
+  }
+
+
+  utterance.onstart =
+    ()=>{
+
+      voiceGlobe.classList.add(
+        "speaking"
+      );
+
+    };
+
+
+  utterance.onend =
+    ()=>{
+
+      voiceGlobe.classList.remove(
+        "speaking"
+      );
+
+    };
+
+
+  utterance.onerror =
+    ()=>{
+
+      voiceGlobe.classList.remove(
+        "speaking"
+      );
+
+    };
+
+
+  speechSynthesis.speak(
+    utterance
+  );
+
+}
+
+
+/* STOP VOICE */
+
+function stopSpeaking(){
+
+  if(
+    "speechSynthesis" in window
+  ){
+
+    speechSynthesis.cancel();
+
+  }
+
+
+  voiceGlobe.classList.remove(
+    "speaking"
+  );
+
+}
+
+
+/* LOAD SYSTEM VOICES */
+
+if(
+  "speechSynthesis" in window
+){
+
+  speechSynthesis.onvoiceschanged =
+    () => {
+
+      speechSynthesis.getVoices();
+
+    };
+
+}
+
+
+/* START */
 
 renderHistory();
 
