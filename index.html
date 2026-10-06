@@ -29,11 +29,7 @@ body{
   gap:16px
 }
 
-.logo{
-  font-size:20px;
-  font-weight:750;
-  padding:8px 4px
-}
+.logo{font-size:20px;font-weight:750;padding:8px 4px}
 
 .new{
   border:1px solid #30343d;
@@ -110,10 +106,7 @@ main{
   padding:30px 16px 150px
 }
 
-.wrap{
-  max-width:850px;
-  margin:auto
-}
+.wrap{max-width:850px;margin:auto}
 
 .welcome{
   text-align:center;
@@ -126,10 +119,7 @@ main{
   letter-spacing:-.04em
 }
 
-.welcome p{
-  color:#8e949f;
-  font-size:16px
-}
+.welcome p{color:#8e949f;font-size:16px}
 
 .msg{
   display:flex;
@@ -169,10 +159,24 @@ main{
 .image-message{
   margin-top:8px;
   max-width:300px;
+  max-height:300px;
   border-radius:12px;
   border:1px solid #343943;
   display:block
 }
+
+.voice-button{
+  margin-top:8px;
+  border:1px solid #343943;
+  background:#20242b;
+  color:#fff;
+  border-radius:9px;
+  padding:6px 10px;
+  cursor:pointer;
+  font-size:12px
+}
+
+.voice-button:hover{background:#292e37}
 
 .composer-area{
   position:fixed;
@@ -227,7 +231,7 @@ main{
   cursor:not-allowed
 }
 
-.photo-button{
+.action-button{
   width:42px;
   height:42px;
   border:1px solid #343943;
@@ -239,7 +243,12 @@ main{
   margin-right:7px
 }
 
-.photo-button:hover{background:#292e37}
+.action-button:hover{background:#292e37}
+
+.mic-active{
+  background:#ffffff;
+  color:#111;
+}
 
 .photo-preview{
   display:none;
@@ -279,9 +288,7 @@ main{
 .typing{color:#8e949f}
 
 .dot{animation:blink 1s infinite}
-
 .dot:nth-child(2){animation-delay:.2s}
-
 .dot:nth-child(3){animation-delay:.4s}
 
 @keyframes blink{
@@ -290,17 +297,10 @@ main{
 
 @media(max-width:700px){
   .sidebar{display:none}
-
   .composer-area{left:0}
-
   .topbar{padding:0 16px}
-
   .welcome h1{font-size:32px}
-
-  .messages{
-    padding-left:12px;
-    padding-right:12px
-  }
+  .messages{padding-left:12px;padding-right:12px}
 }
 </style>
 </head>
@@ -321,7 +321,7 @@ main{
   </div>
 
   <div class="sidebar-footer">
-    Your AI assistant · Local demo
+    Your AI assistant · Voice · Vision
   </div>
 
 </aside>
@@ -369,7 +369,17 @@ main{
 
         <button
           type="button"
-          class="photo-button"
+          class="action-button"
+          id="micButton"
+          onclick="toggleMic()"
+          title="Speak"
+        >
+          🎙️
+        </button>
+
+        <button
+          type="button"
+          class="action-button"
           onclick="document.getElementById('imageInput').click()"
           title="Upload photo"
         >
@@ -389,7 +399,7 @@ main{
     </div>
 
     <div class="hint">
-      Enter to send · Shift+Enter for a new line · 📷 Upload a photo
+      🎙️ Speak · 📷 Upload photo · Enter to send · Shift+Enter for new line
     </div>
 
   </div>
@@ -406,13 +416,17 @@ const send = document.getElementById('send');
 const imageInput = document.getElementById('imageInput');
 const photoPreview = document.getElementById('photoPreview');
 const previewImage = document.getElementById('previewImage');
+const micButton = document.getElementById('micButton');
 
 let messages = [];
+
 let chats = JSON.parse(
   localStorage.getItem('ask-anything-chats') || '[]'
 );
 
 let selectedImage = null;
+let recognition = null;
+let isListening = false;
 
 
 /* -------------------------
@@ -462,7 +476,10 @@ function escapeHtml(s){
 function newChat(){
 
   messages = [];
+
   selectedImage = null;
+
+  stopSpeaking();
 
   removePhoto();
 
@@ -470,8 +487,7 @@ function newChat(){
     <div class="welcome">
       <h1>What can I help you with?</h1>
       <p>
-        Ask questions, brainstorm ideas, learn something new,
-        or upload a photo for help.
+        Ask questions, speak naturally, or upload a photo for help.
       </p>
     </div>
   `;
@@ -540,13 +556,220 @@ function removePhoto(){
 
 
 /* -------------------------
+   VOICE INPUT
+------------------------- */
+
+function setupSpeechRecognition(){
+
+  const SpeechRecognition =
+    window.SpeechRecognition ||
+    window.webkitSpeechRecognition;
+
+  if(!SpeechRecognition){
+
+    micButton.title =
+      'Speech recognition is not supported in this browser';
+
+    return;
+  }
+
+  recognition = new SpeechRecognition();
+
+  recognition.continuous = false;
+
+  recognition.interimResults = true;
+
+  recognition.lang = 'en-IN';
+
+  recognition.onstart = function(){
+
+    isListening = true;
+
+    micButton.classList.add('mic-active');
+
+    micButton.textContent = '⏹️';
+
+    document.getElementById('status').textContent =
+      'Listening...';
+
+  };
+
+  recognition.onresult = function(event){
+
+    let transcript = '';
+
+    for(
+      let i = event.resultIndex;
+      i < event.results.length;
+      i++
+    ){
+
+      transcript +=
+        event.results[i][0].transcript;
+
+    }
+
+    input.value = transcript;
+
+    input.style.height = 'auto';
+
+    input.style.height =
+      Math.min(input.scrollHeight,180) + 'px';
+
+  };
+
+  recognition.onerror = function(event){
+
+    console.error('Speech recognition error:',event.error);
+
+    document.getElementById('status').textContent =
+      'Voice error';
+
+    stopMic();
+
+  };
+
+  recognition.onend = function(){
+
+    stopMic();
+
+    document.getElementById('status').textContent =
+      'Connected';
+
+  };
+
+}
+
+
+function toggleMic(){
+
+  if(!recognition){
+
+    alert(
+      'Voice input is not supported by this browser. Try Chrome or Android Chrome.'
+    );
+
+    return;
+  }
+
+  if(isListening){
+
+    recognition.stop();
+
+  }else{
+
+    try{
+
+      recognition.start();
+
+    }catch(error){
+
+      console.error(error);
+
+    }
+
+  }
+
+}
+
+
+function stopMic(){
+
+  isListening = false;
+
+  micButton.classList.remove('mic-active');
+
+  micButton.textContent = '🎙️';
+
+}
+
+
+/* -------------------------
+   VOICE OUTPUT
+------------------------- */
+
+function speakText(text,button){
+
+  if(!('speechSynthesis' in window)){
+
+    alert(
+      'Voice output is not supported by this browser.'
+    );
+
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  if(button){
+
+    button.textContent = '⏹️ Stop';
+
+  }
+
+  const utterance =
+    new SpeechSynthesisUtterance(text);
+
+  utterance.lang = 'en-IN';
+
+  utterance.rate = 1;
+
+  utterance.pitch = 1;
+
+  utterance.onend = function(){
+
+    if(button){
+
+      button.textContent = '🔊 Listen';
+
+    }
+
+  };
+
+  utterance.onerror = function(){
+
+    if(button){
+
+      button.textContent = '🔊 Listen';
+
+    }
+
+  };
+
+  speechSynthesis.speak(utterance);
+
+}
+
+
+function stopSpeaking(){
+
+  if('speechSynthesis' in window){
+
+    speechSynthesis.cancel();
+
+  }
+
+  document
+    .querySelectorAll('.voice-button')
+    .forEach(button => {
+
+      button.textContent = '🔊 Listen';
+
+    });
+
+}
+
+
+/* -------------------------
    ADD MESSAGE
 ------------------------- */
 
 function addMessage(role,text,image=null){
 
   if(document.querySelector('.welcome')){
+
     chat.innerHTML='';
+
   }
 
   const el = document.createElement('div');
@@ -564,6 +787,27 @@ function addMessage(role,text,image=null){
 
   }
 
+  let voiceHtml = '';
+
+  if(role === 'assistant'){
+
+    const voiceId =
+      'voice-' + Date.now() + '-' +
+      Math.random().toString(36).slice(2);
+
+    voiceHtml =
+      `<button
+        class="voice-button"
+        id="${voiceId}"
+        onclick="speakText(
+          ${JSON.stringify(text).replace(/</g,'\\u003c')},
+          this
+        )">
+        🔊 Listen
+      </button>`;
+
+  }
+
   el.innerHTML = `
     <div class="avatar">
       ${role === 'user' ? 'You' : '✦'}
@@ -572,12 +816,14 @@ function addMessage(role,text,image=null){
     <div class="bubble">
       ${escapeHtml(text)}
       ${imageHtml}
+      ${voiceHtml}
     </div>
   `;
 
   chat.appendChild(el);
 
-  document.getElementById('messages').scrollTop = 999999;
+  document.getElementById('messages').scrollTop =
+    999999;
 
 }
 
@@ -595,6 +841,8 @@ async function sendMessage(){
     send.disabled
   ) return;
 
+  stopSpeaking();
+
   const imageToSend = selectedImage;
 
   input.value = '';
@@ -602,9 +850,15 @@ async function sendMessage(){
   input.style.height = 'auto';
 
   const userMessage = {
+
     role:'user',
-    content:text || 'Please analyze this image.',
-    image:imageToSend || null
+
+    content:
+      text || 'Please analyze this image.',
+
+    image:
+      imageToSend || null
+
   };
 
   messages.push(userMessage);
@@ -619,12 +873,15 @@ async function sendMessage(){
 
   send.disabled = true;
 
-  const typing = document.createElement('div');
+  const typing =
+    document.createElement('div');
 
-  typing.className = 'msg assistant';
+  typing.className =
+    'msg assistant';
 
   typing.innerHTML = `
     <div class="avatar">✦</div>
+
     <div class="bubble typing">
       Thinking
       <span class="dot">•</span>
@@ -635,37 +892,52 @@ async function sendMessage(){
 
   chat.appendChild(typing);
 
+  document
+    .getElementById('messages')
+    .scrollTop = 999999;
+
   try{
 
     const r = await fetch(
       '/api/chat',
       {
         method:'POST',
+
         headers:{
-          'Content-Type':'application/json'
+          'Content-Type':
+            'application/json'
         },
+
         body:JSON.stringify({
           messages:messages
         })
+
       }
     );
 
     if(!r.ok){
 
-      throw new Error('Backend error');
+      throw new Error(
+        'Backend error'
+      );
 
     }
 
-    const data = await r.json();
+    const data =
+      await r.json();
 
     typing.remove();
 
     const answer =
-      data.answer || 'No answer returned.';
+      data.answer ||
+      'No answer returned.';
 
     messages.push({
+
       role:'assistant',
+
       content:answer
+
     });
 
     addMessage(
@@ -673,9 +945,13 @@ async function sendMessage(){
       answer
     );
 
-    saveChat(text || 'Photo question');
+    saveChat(
+      text || 'Photo question'
+    );
 
-    document.getElementById('status').textContent =
+    document
+      .getElementById('status')
+      .textContent =
       'Connected';
 
   }
@@ -688,8 +964,11 @@ async function sendMessage(){
       'Sorry, I could not process your request right now.';
 
     messages.push({
+
       role:'assistant',
+
       content:errorMessage
+
     });
 
     addMessage(
@@ -697,7 +976,9 @@ async function sendMessage(){
       errorMessage
     );
 
-    document.getElementById('status').textContent =
+    document
+      .getElementById('status')
+      .textContent =
       'Connection error';
 
     console.error(e);
@@ -717,14 +998,19 @@ async function sendMessage(){
 
 function saveChat(first){
 
-  if(!messages.length) return;
+  if(!messages.length)
+    return;
 
   chats.push({
+
     title:first.slice(0,42),
+
     messages:messages
+
   });
 
-  chats = chats.slice(-20);
+  chats =
+    chats.slice(-20);
 
   localStorage.setItem(
     'ask-anything-chats',
@@ -746,18 +1032,23 @@ function loadChat(i){
 
   if(!c) return;
 
-  messages = c.messages || [];
+  messages =
+    c.messages || [];
 
   chat.innerHTML = '';
 
   messages.forEach(m => {
 
     addMessage(
+
       m.role === 'user'
         ? 'user'
         : 'assistant',
+
       m.content,
+
       m.image || null
+
     );
 
   });
@@ -796,7 +1087,8 @@ input.addEventListener(
   'input',
   () => {
 
-    input.style.height = 'auto';
+    input.style.height =
+      'auto';
 
     input.style.height =
       Math.min(
@@ -811,6 +1103,8 @@ input.addEventListener(
 /* -------------------------
    START
 ------------------------- */
+
+setupSpeechRecognition();
 
 renderHistory();
 
