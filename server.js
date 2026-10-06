@@ -6,55 +6,99 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// Allow JSON requests containing images
-app.use(express.json({ limit: "15mb" }));
+app.use(
+  express.json({
+    limit: "30mb"
+  })
+);
 
 app.use(express.static(__dirname));
 
 app.post("/api/chat", async (req, res) => {
   try {
-    const contents = (req.body.messages || [])
-      .filter((m) => m.role === "user" || m.role === "assistant")
+    const messages = req.body.messages || [];
+
+    const contents = messages
+      .filter(
+        (m) =>
+          m.role === "user" ||
+          m.role === "assistant"
+      )
       .map((m) => {
         const parts = [];
 
-        // Add text
+        // Text
         if (m.content) {
           parts.push({
             text: String(m.content)
           });
         }
 
-        // Add uploaded image
-        if (m.image && typeof m.image === "string") {
-          const match = m.image.match(
-            /^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/
-          );
+        // Photos and PDFs
+        if (
+          m.role === "user" &&
+          Array.isArray(m.attachments)
+        ) {
+          for (const file of m.attachments) {
+            if (
+              !file ||
+              typeof file.data !== "string"
+            ) {
+              continue;
+            }
 
-          if (match) {
-            parts.push({
-              inline_data: {
-                mime_type: match[1],
-                data: match[2]
-              }
-            });
+            const match = file.data.match(
+              /^data:([^;]+);base64,(.+)$/
+            );
+
+            if (!match) {
+              continue;
+            }
+
+            const mimeType = match[1];
+            const base64Data = match[2];
+
+            if (
+              mimeType.startsWith("image/") ||
+              mimeType === "application/pdf"
+            ) {
+              parts.push({
+                inline_data: {
+                  mime_type: mimeType,
+                  data: base64Data
+                }
+              });
+            }
           }
         }
 
         return {
-          role: m.role === "assistant" ? "model" : "user",
+          role:
+            m.role === "assistant"
+              ? "model"
+              : "user",
           parts
         };
       });
+
+    if (!contents.length) {
+      return res.status(400).json({
+        answer:
+          "Please enter a message or attach a file."
+      });
+    }
 
     const response = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash-lite:generateContent",
       {
         method: "POST",
+
         headers: {
           "Content-Type": "application/json",
-          "x-goog-api-key": process.env.GEMINI_API_KEY
+          "x-goog-api-key":
+            process.env.GEMINI_API_KEY
         },
+
         body: JSON.stringify({
           contents: contents
         })
@@ -64,26 +108,34 @@ app.post("/api/chat", async (req, res) => {
     const data = await response.json();
 
     if (!response.ok) {
-      console.error(data);
-      throw new Error("Gemini API returned an error");
+      console.error("Gemini error:", data);
+      throw new Error(
+        "Gemini API returned an error"
+      );
     }
 
     const answer =
       data.candidates?.[0]?.content?.parts
         ?.map((part) => part.text || "")
-        .join("") || "No answer returned.";
+        .join("") ||
+      "No answer returned.";
 
-    res.json({ answer });
+    res.json({
+      answer: answer
+    });
 
   } catch (error) {
-    console.error(error);
+    console.error("Server error:", error);
 
     res.status(500).json({
-      answer: "Could not connect to the AI service."
+      answer:
+        "Could not connect to the AI service."
     });
   }
 });
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`AI server running on port ${PORT}`);
+  console.log(
+    `AI server running on port ${PORT}`
+  );
 });
