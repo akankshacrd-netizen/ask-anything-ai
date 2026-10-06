@@ -2,7 +2,7 @@ const express = require("express");
 const cors = require("cors");
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
@@ -10,35 +10,48 @@ app.use(express.static(__dirname));
 
 app.post("/api/chat", async (req, res) => {
   try {
-    const response = await fetch("http://127.0.0.1:11434/api/chat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: "llama3.2:1b",
-        messages: req.body.messages,
-        stream: false
-      })
-    });
+    const contents = (req.body.messages || [])
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .map((m) => ({
+        role: m.role === "assistant" ? "model" : "user",
+        parts: [{ text: String(m.content || "") }]
+      }));
 
-    if (!response.ok) {
-      throw new Error("Ollama returned an error");
-    }
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-goog-api-key": process.env.GEMINI_API_KEY
+        },
+        body: JSON.stringify({
+          contents: contents
+        })
+      }
+    );
 
     const data = await response.json();
 
-    res.json({
-      answer: data.message.content
-    });
+    if (!response.ok) {
+      console.error(data);
+      throw new Error("Gemini API returned an error");
+    }
+
+    const answer =
+      data.candidates?.[0]?.content?.parts
+        ?.map((part) => part.text || "")
+        .join("") || "No answer returned.";
+
+    res.json({ answer });
   } catch (error) {
     console.error(error);
     res.status(500).json({
-      answer: "Could not connect to Ollama."
+      answer: "Could not connect to the AI service."
     });
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`AI website running at http://localhost:${PORT}`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`AI server running on port ${PORT}`);
 });
