@@ -1390,7 +1390,21 @@ async function createAudioInput(){
     liveProcessor
   );
 
+  /*
+    ScriptProcessorNode must be connected to keep processing
+    reliably in Safari, but its output should be silent so
+    the microphone is not played back into the speaker.
+  */
+  const silentGain =
+    liveAudioContext.createGain();
+
+  silentGain.gain.value = 0;
+
   liveProcessor.connect(
+    silentGain
+  );
+
+  silentGain.connect(
     liveAudioContext.destination
   );
 
@@ -1701,11 +1715,9 @@ async function startLiveVoice(){
             model:
               "models/gemini-3.8-live",
 
-            generationConfig:{
-              responseModalities:[
-                "AUDIO"
-              ]
-            },
+            responseModalities:[
+              "AUDIO"
+            ],
 
             systemInstruction:{
               parts:[
@@ -1739,34 +1751,17 @@ Keep responses reasonably concise for voice conversation.
         );
 
         liveConnected = true;
-        liveRunning = true;
 
-        voiceMic.classList.add(
-          "active"
-        );
+        /*
+          Do not start sending microphone audio until
+          Gemini confirms that the Live setup is complete.
+          This is especially important for Safari.
+        */
 
         voiceStatus.textContent =
-          "Listening…";
+          "Connecting…";
 
-        setGlobe("listening");
-
-        try{
-
-          await createAudioInput();
-
-        }catch(error){
-
-          console.error(
-            "Microphone error:",
-            error
-          );
-
-          voiceStatus.textContent =
-            "Microphone permission required.";
-
-          await stopLiveVoice();
-
-        }
+        setGlobe("thinking");
 
       };
 
@@ -1779,6 +1774,59 @@ Keep responses reasonably concise for voice conversation.
             JSON.parse(
               event.data
             );
+
+          /*
+            Gemini confirms the Live configuration with
+            setupComplete. Only then do we start the
+            microphone stream.
+          */
+          if(response.setupComplete){
+
+            liveRunning = true;
+
+            voiceMic.classList.add(
+              "active"
+            );
+
+            voiceStatus.textContent =
+              "Listening…";
+
+            setGlobe("listening");
+
+            try{
+
+              await createAudioInput();
+
+            }catch(error){
+
+              console.error(
+                "Microphone error:",
+                error
+              );
+
+              voiceStatus.textContent =
+                "Microphone permission required.";
+
+              await stopLiveVoice();
+
+            }
+
+            return;
+          }
+
+          if(response.error){
+
+            console.error(
+              "Gemini Live error:",
+              response.error
+            );
+
+            voiceStatus.textContent =
+              response.error.message ||
+              "Voice connection error.";
+
+            return;
+          }
 
           const serverContent =
             response.serverContent;
