@@ -1715,9 +1715,11 @@ async function startLiveVoice(){
             model:
               "models/gemini-3.8-live",
 
-            responseModalities:[
-              "AUDIO"
-            ],
+            generationConfig:{
+              responseModalities:[
+                "AUDIO"
+              ]
+            },
 
             systemInstruction:{
               parts:[
@@ -1738,11 +1740,12 @@ Keep responses reasonably concise for voice conversation.
               ]
             },
 
-            inputAudioTranscription:{},
-
-            outputAudioTranscription:{},
-
-            sessionResumption:{}
+            /*
+              Keep the first setup message minimal for maximum
+              Safari/Android compatibility. We can add
+              transcription and session resumption after the
+              basic audio session is working.
+            */
           }
         };
 
@@ -1821,9 +1824,15 @@ Keep responses reasonably concise for voice conversation.
               response.error
             );
 
-            voiceStatus.textContent =
+            const errorMessage =
               response.error.message ||
+              response.error.status ||
               "Voice connection error.";
+
+            voiceStatus.textContent =
+              errorMessage;
+
+            setGlobe("");
 
             return;
           }
@@ -1941,8 +1950,23 @@ Keep responses reasonably concise for voice conversation.
 
         if(!liveClosing){
 
+          const reason =
+            event.reason
+              ? " — " + event.reason
+              : "";
+
           voiceStatus.textContent =
-            "Connection closed";
+            "Connection closed (" +
+            event.code +
+            ")" +
+            reason;
+
+          console.error(
+            "Gemini Live closed. Code:",
+            event.code,
+            "Reason:",
+            event.reason || "(none)"
+          );
 
           setGlobe("");
 
