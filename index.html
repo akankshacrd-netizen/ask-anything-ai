@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Ask Anything AI</title>
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
 
 html,body{
   margin:0;
@@ -21,10 +25,19 @@ body{
   overflow:hidden;
 }
 
+button,
+textarea{
+  font:inherit;
+}
+
+button{
+  touch-action:manipulation;
+}
+
 .app{
   display:flex;
   width:100%;
-  height:100vh;
+  height:100dvh;
 }
 
 .sidebar{
@@ -94,6 +107,7 @@ main{
 
 .topbar{
   height:60px;
+  flex:0 0 60px;
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -117,6 +131,7 @@ main{
 .messages{
   flex:1;
   overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   padding:30px 18px 150px;
   scroll-behavior:smooth;
 }
@@ -140,8 +155,6 @@ main{
 .welcome p{
   color:#8c8694;
 }
-
-/* NORMAL COMPACT MESSAGES */
 
 .msg{
   display:flex;
@@ -177,16 +190,12 @@ main{
   padding:2px 0;
 }
 
-/* User messages are compact */
-
 .user .bubble{
   background:#19161e;
   border:1px solid #302a35;
   border-radius:14px;
   padding:9px 13px;
 }
-
-/* Attachments */
 
 .image-message{
   display:block;
@@ -221,8 +230,6 @@ main{
   white-space:nowrap;
 }
 
-/* Composer */
-
 .composer-area{
   position:fixed;
   left:255px;
@@ -230,6 +237,7 @@ main{
   bottom:0;
   padding:15px 18px 22px;
   background:linear-gradient(transparent,#09080d 28%);
+  z-index:20;
 }
 
 .composer{
@@ -257,33 +265,29 @@ textarea{
   outline:0;
   background:transparent;
   color:#fff;
-  font:inherit;
+}
+
+.tool,
+.send{
+  width:42px;
+  height:42px;
+  flex:0 0 42px;
+  border-radius:12px;
+  cursor:pointer;
 }
 
 .tool{
-  width:42px;
-  height:42px;
-  border-radius:12px;
   border:1px solid #38313f;
   background:#211d27;
   color:#fff;
   font-size:17px;
-  cursor:pointer;
-}
-
-.tool:hover{
-  background:#2c2532;
 }
 
 .send{
-  width:42px;
-  height:42px;
   border:0;
-  border-radius:12px;
   background:#fff;
   color:#111;
   font-size:18px;
-  cursor:pointer;
 }
 
 .send:disabled{
@@ -339,7 +343,7 @@ textarea{
   margin-top:7px;
 }
 
-/* VOICE */
+/* ---------------- LIVE VOICE ---------------- */
 
 .voice-overlay{
   position:fixed;
@@ -349,7 +353,17 @@ textarea{
   align-items:center;
   justify-content:center;
   background:
-    radial-gradient(circle at center,#21132f 0%,#0a090e 42%,#040406 100%);
+    radial-gradient(
+      circle at center,
+      #21132f 0%,
+      #0a090e 42%,
+      #040406 100%
+    );
+  padding:
+    env(safe-area-inset-top)
+    env(safe-area-inset-right)
+    env(safe-area-inset-bottom)
+    env(safe-area-inset-left);
 }
 
 .voice-overlay.active{
@@ -358,14 +372,14 @@ textarea{
 
 .voice-title{
   position:absolute;
-  top:34px;
+  top:calc(34px + env(safe-area-inset-top));
   font-size:18px;
   font-weight:650;
 }
 
 .voice-status{
   position:absolute;
-  top:67px;
+  top:calc(67px + env(safe-area-inset-top));
   color:#a59eae;
   font-size:13px;
 }
@@ -419,28 +433,44 @@ textarea{
 }
 
 @keyframes float{
-  0%,100%{transform:translateY(0) scale(1)}
-  50%{transform:translateY(-8px) scale(1.015)}
+  0%,100%{
+    transform:translateY(0) scale(1);
+  }
+  50%{
+    transform:translateY(-8px) scale(1.015);
+  }
 }
 
 @keyframes listen{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.07)}
+  0%,100%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.07);
+  }
 }
 
 @keyframes think{
-  0%,100%{transform:scale(1) rotate(0deg)}
-  50%{transform:scale(1.035) rotate(3deg)}
+  0%,100%{
+    transform:scale(1) rotate(0deg);
+  }
+  50%{
+    transform:scale(1.035) rotate(3deg);
+  }
 }
 
 @keyframes speak{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.09)}
+  0%,100%{
+    transform:scale(1);
+  }
+  50%{
+    transform:scale(1.09);
+  }
 }
 
 .voice-controls{
   position:absolute;
-  bottom:45px;
+  bottom:calc(45px + env(safe-area-inset-bottom));
   display:flex;
   gap:18px;
 }
@@ -462,7 +492,12 @@ textarea{
   color:#111;
 }
 
-/* Mobile */
+.voice-btn.active{
+  background:#b967ff;
+  color:#fff;
+}
+
+/* ---------------- MOBILE ---------------- */
 
 @media(max-width:700px){
 
@@ -472,6 +507,10 @@ textarea{
 
   .composer-area{
     left:0;
+    padding-left:10px;
+    padding-right:10px;
+    padding-bottom:
+      calc(10px + env(safe-area-inset-bottom));
   }
 
   .topbar{
@@ -496,6 +535,13 @@ textarea{
     height:215px;
   }
 }
+
+@media(prefers-reduced-motion:reduce){
+
+  .globe{
+    animation:none!important;
+  }
+}
 </style>
 </head>
 
@@ -512,11 +558,8 @@ textarea{
 </button>
 
 <div class="history">
-
 <h4>Recent chats</h4>
-
 <div id="history"></div>
-
 </div>
 
 <div class="sidebar-footer">
@@ -540,9 +583,7 @@ Connected
 </header>
 
 <section class="messages" id="messages">
-
 <div class="wrap" id="chat"></div>
-
 </section>
 
 <div class="composer-area">
@@ -620,15 +661,21 @@ Enter to send · Shift+Enter for new line · 📷 Photo · 📄 PDF · 🎙️ V
 
 </div>
 
-<!-- VOICE SCREEN -->
+<!-- LIVE VOICE -->
 
-<div class="voice-overlay" id="voiceOverlay">
+<div
+class="voice-overlay"
+id="voiceOverlay"
+>
 
 <div class="voice-title">
 Ask Anything AI
 </div>
 
-<div class="voice-status" id="voiceStatus">
+<div
+class="voice-status"
+id="voiceStatus"
+>
 Tap the microphone
 </div>
 
@@ -642,6 +689,7 @@ id="globe"
 <button
 class="voice-btn"
 onclick="closeVoice()"
+aria-label="Close voice mode"
 >
 ×
 </button>
@@ -649,7 +697,8 @@ onclick="closeVoice()"
 <button
 class="voice-btn mic"
 id="voiceMic"
-onclick="toggleVoice()"
+onclick="toggleLiveVoice()"
+aria-label="Start voice assistant"
 >
 🎙️
 </button>
@@ -659,857 +708,1464 @@ onclick="toggleVoice()"
 </div>
 
 <script>
+/* =========================================================
+   BASIC APP STATE
+========================================================= */
 
-const chat=document.getElementById("chat");
-const messagesBox=document.getElementById("messages");
-const input=document.getElementById("input");
-const send=document.getElementById("send");
+const chat =
+  document.getElementById("chat");
 
-const imageInput=document.getElementById("imageInput");
-const pdfInput=document.getElementById("pdfInput");
-const attachments=document.getElementById("attachments");
+const messagesBox =
+  document.getElementById("messages");
 
-const voiceOverlay=document.getElementById("voiceOverlay");
-const voiceStatus=document.getElementById("voiceStatus");
-const globe=document.getElementById("globe");
+const input =
+  document.getElementById("input");
 
-let messages=[];
+const send =
+  document.getElementById("send");
 
-let chats=JSON.parse(
-localStorage.getItem("ask-anything-chats")||"[]"
-);
+const imageInput =
+  document.getElementById("imageInput");
 
-let selectedFiles=[];
+const pdfInput =
+  document.getElementById("pdfInput");
 
-let recognition=null;
-let listening=false;
-let voiceBusy=false;
+const attachments =
+  document.getElementById("attachments");
 
-/* ---------- HELPERS ---------- */
+const voiceOverlay =
+  document.getElementById("voiceOverlay");
+
+const voiceStatus =
+  document.getElementById("voiceStatus");
+
+const globe =
+  document.getElementById("globe");
+
+const voiceMic =
+  document.getElementById("voiceMic");
+
+const statusBadge =
+  document.getElementById("status");
+
+let messages = [];
+
+let chats =
+  JSON.parse(
+    localStorage.getItem(
+      "ask-anything-chats"
+    ) || "[]"
+  );
+
+let selectedFiles = [];
+
+let normalBusy = false;
+
+/* LIVE AUDIO */
+
+let liveSocket = null;
+let liveStream = null;
+let liveAudioContext = null;
+let liveProcessor = null;
+let liveSource = null;
+
+let liveRunning = false;
+let liveConnected = false;
+let liveClosing = false;
+
+let playbackTime = 0;
+
+let liveSessionToken = null;
+
+const audioQueue = [];
+
+/* =========================================================
+   HELPERS
+========================================================= */
 
 function escapeHtml(s){
-
-return String(s).replace(
-/[&<>"']/g,
-m=>({
-"&":"&amp;",
-"<":"&lt;",
-">":"&gt;",
-'"':"&quot;",
-"'":"&#039;"
-}[m])
-);
-
+  return String(s).replace(
+    /[&<>"']/g,
+    m => ({
+      "&":"&amp;",
+      "<":"&lt;",
+      ">":"&gt;",
+      '"':"&quot;",
+      "'":"&#039;"
+    }[m])
+  );
 }
 
 function scrollBottom(){
 
-requestAnimationFrame(()=>{
-messagesBox.scrollTop=
-messagesBox.scrollHeight;
-});
-
-}
-
-/* ---------- CHAT ---------- */
-
-function newChat(){
-
-messages=[];
-
-selectedFiles=[];
-
-renderAttachments();
-
-chat.innerHTML=`
-
-<div class="welcome">
-
-<h1>What can I help you with?</h1>
-
-<p>
-Ask anything, upload a photo or PDF,
-or talk with your AI assistant.
-</p>
-
-</div>
-
-`;
-
-}
-
-function addMessage(role,text,files=[]){
-
-if(document.querySelector(".welcome")){
-chat.innerHTML="";
-}
-
-const el=document.createElement("div");
-
-el.className="msg "+role;
-
-const avatar=
-role==="user"?"You":"✦";
-
-let fileHtml="";
-
-for(const file of files){
-
-if(file.type==="image"){
-
-fileHtml+=`
-<img
-class="image-message"
-src="${file.data}"
->
-`;
-
-}else{
-
-fileHtml+=`
-
-<div class="pdf-card">
-
-<div class="pdf-icon">📄</div>
-
-<div class="pdf-name">
-${escapeHtml(file.name)}
-</div>
-
-</div>
-
-`;
-
-}
-
-}
-
-el.innerHTML=`
-
-<div class="avatar">
-${avatar}
-</div>
-
-<div class="bubble">
-${escapeHtml(text)}
-${fileHtml}
-</div>
-
-`;
-
-chat.appendChild(el);
-
-scrollBottom();
-
-return el;
-}
-
-/* ---------- FILES ---------- */
-
-function fileToDataURL(file){
-
-return new Promise((resolve,reject)=>{
-
-const reader=new FileReader();
-
-reader.onload=()=>{
-resolve(reader.result);
-};
-
-reader.onerror=reject;
-
-reader.readAsDataURL(file);
-
-});
-
-}
-
-imageInput.onchange=async()=>{
-
-for(const file of imageInput.files){
-
-if(!file.type.startsWith("image/")){
-continue;
-}
-
-if(file.size>10*1024*1024){
-alert("Image must be under 10 MB.");
-continue;
-}
-
-selectedFiles.push({
-
-type:"image",
-name:file.name,
-mime:file.type,
-data:await fileToDataURL(file)
-
-});
-
-}
-
-imageInput.value="";
-
-renderAttachments();
-
-};
-
-pdfInput.onchange=async()=>{
-
-const file=pdfInput.files[0];
-
-if(!file){
-return;
-}
-
-if(file.size>20*1024*1024){
-
-alert("PDF must be under 20 MB.");
-
-pdfInput.value="";
-
-return;
-}
-
-selectedFiles.push({
-
-type:"pdf",
-name:file.name,
-mime:"application/pdf",
-data:await fileToDataURL(file)
-
-});
-
-pdfInput.value="";
-
-renderAttachments();
-
-};
-
-function renderAttachments(){
-
-if(!selectedFiles.length){
-
-attachments.style.display="none";
-attachments.innerHTML="";
-
-return;
-
-}
-
-attachments.style.display="flex";
-
-attachments.innerHTML=
-selectedFiles.map((file,i)=>{
-
-if(file.type==="image"){
-
-return`
-
-<div class="attachment">
-
-<img src="${file.data}">
-
-<button
-class="remove"
-onclick="removeFile(${i})"
->
-×
-</button>
-
-</div>
-
-`;
-
-}
-
-return`
-
-<div class="attachment">
-
-<div class="pdf-preview">
-
-<span>📄</span>
-
-<span class="pdf-name">
-${escapeHtml(file.name)}
-</span>
-
-</div>
-
-<button
-class="remove"
-onclick="removeFile(${i})"
->
-×
-</button>
-
-</div>
-
-`;
-
-}).join("");
-
-}
-
-function removeFile(i){
-
-selectedFiles.splice(i,1);
-
-renderAttachments();
-
-}
-
-/* ---------- NORMAL CHAT SEND ---------- */
-
-async function sendMessage(){
-
-const text=input.value.trim();
-
-if(
-(!text&&!selectedFiles.length)||
-send.disabled
-){
-return;
-}
-
-const files=[...selectedFiles];
-
-input.value="";
-input.style.height="auto";
-
-messages.push({
-
-role:"user",
-content:text||"Please analyze the attached file.",
-attachments:files
-
-});
-
-addMessage(
-"user",
-text||"Please analyze the attached file.",
-files
-);
-
-selectedFiles=[];
-
-renderAttachments();
-
-send.disabled=true;
-
-const thinking=addMessage(
-"assistant",
-""
-);
-
-thinking.querySelector(".bubble").innerHTML=
-`<span style="color:#8d8794">Thinking…</span>`;
-
-try{
-
-const response=await fetch("/api/chat",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-messages:messages
-})
-
-});
-
-if(!response.ok){
-throw new Error("AI error");
-}
-
-const data=await response.json();
-
-thinking.querySelector(".bubble").textContent=
-data.answer||"No answer returned.";
-
-messages.push({
-
-role:"assistant",
-content:data.answer||""
-
-});
-
-saveChat(text||files[0]?.name||"New chat");
-
-document.getElementById("status").textContent=
-"Connected";
-
-}catch(error){
-
-console.error(error);
-
-thinking.querySelector(".bubble").textContent=
-"Sorry, I couldn't process that right now.";
-
-}
-
-send.disabled=false;
-
-}
-
-/* ---------- VOICE MODE ---------- */
-
-function openVoice(){
-
-voiceOverlay.classList.add("active");
-
-voiceStatus.textContent=
-"Tap the microphone";
-
-setGlobe("");
-
-}
-
-function closeVoice(){
-
-stopListening();
-
-speechSynthesis.cancel();
-
-voiceBusy=false;
-
-voiceOverlay.classList.remove("active");
-
-setGlobe("");
+  requestAnimationFrame(() => {
+    messagesBox.scrollTop =
+      messagesBox.scrollHeight;
+  });
 
 }
 
 function setGlobe(state){
 
-globe.classList.remove(
-"listening",
-"thinking",
-"speaking"
-);
+  globe.classList.remove(
+    "listening",
+    "thinking",
+    "speaking"
+  );
 
-if(state){
-globe.classList.add(state);
-}
-
-}
-
-function createRecognition(){
-
-const SpeechRecognition=
-window.SpeechRecognition||
-window.webkitSpeechRecognition;
-
-if(!SpeechRecognition){
-
-alert(
-"Voice recognition isn't supported by this browser."
-);
-
-return null;
+  if(state){
+    globe.classList.add(state);
+  }
 
 }
 
-const r=new SpeechRecognition();
+/* =========================================================
+   CHAT
+========================================================= */
 
-r.lang="en-US";
+function newChat(){
 
-r.continuous=false;
+  messages = [];
+  selectedFiles = [];
 
-r.interimResults=false;
+  renderAttachments();
 
-r.maxAlternatives=1;
-
-r.onstart=()=>{
-
-listening=true;
-
-voiceStatus.textContent=
-"Listening…";
-
-setGlobe("listening");
-
-};
-
-r.onresult=async event=>{
-
-const spoken=
-event.results[0][0].transcript.trim();
-
-listening=false;
-
-setGlobe("thinking");
-
-voiceStatus.textContent=
-"Thinking…";
-
-await voiceAsk(spoken);
-
-};
-
-r.onerror=error=>{
-
-console.error(error);
-
-listening=false;
-
-voiceStatus.textContent=
-"Tap the microphone";
-
-setGlobe("");
-
-};
-
-r.onend=()=>{
-
-listening=false;
-
-};
-
-return r;
+  chat.innerHTML = `
+    <div class="welcome">
+      <h1>What can I help you with?</h1>
+      <p>
+        Ask anything, upload a photo or PDF,
+        or talk with your AI assistant.
+      </p>
+    </div>
+  `;
 
 }
 
-function toggleVoice(){
+function addMessage(
+  role,
+  text,
+  files=[]
+){
 
-if(voiceBusy){
-return;
+  if(
+    document.querySelector(".welcome")
+  ){
+    chat.innerHTML = "";
+  }
+
+  const el =
+    document.createElement("div");
+
+  el.className =
+    "msg " + role;
+
+  const avatar =
+    role === "user"
+      ? "You"
+      : "✦";
+
+  let fileHtml = "";
+
+  for(const file of files){
+
+    if(file.type === "image"){
+
+      fileHtml += `
+        <img
+          class="image-message"
+          src="${file.data}"
+        >
+      `;
+
+    }else{
+
+      fileHtml += `
+        <div class="pdf-card">
+          <div class="pdf-icon">📄</div>
+          <div class="pdf-name">
+            ${escapeHtml(file.name)}
+          </div>
+        </div>
+      `;
+
+    }
+
+  }
+
+  el.innerHTML = `
+    <div class="avatar">
+      ${avatar}
+    </div>
+
+    <div class="bubble">
+      ${escapeHtml(text)}
+      ${fileHtml}
+    </div>
+  `;
+
+  chat.appendChild(el);
+
+  scrollBottom();
+
+  return el;
 }
 
-if(listening){
+/* =========================================================
+   FILES
+========================================================= */
 
-stopListening();
+function fileToDataURL(file){
 
-return;
+  return new Promise(
+    (resolve,reject) => {
 
-}
+      const reader =
+        new FileReader();
 
-recognition=createRecognition();
+      reader.onload =
+        () => resolve(reader.result);
 
-if(!recognition){
-return;
-}
+      reader.onerror =
+        reject;
 
-try{
+      reader.readAsDataURL(file);
 
-recognition.start();
-
-}catch(e){
-
-console.error(e);
-
-}
-
-}
-
-function stopListening(){
-
-if(recognition){
-
-try{
-recognition.stop();
-}catch(e){}
-
-}
-
-listening=false;
-
-setGlobe("");
-
-}
-
-/* ---------- DIRECT VOICE AI ---------- */
-
-async function voiceAsk(text){
-
-voiceBusy=true;
-
-try{
-
-/*
-  Keep the voice conversation in memory,
-  but don't force the user back into chat.
-*/
-
-messages.push({
-
-role:"user",
-content:text
-
-});
-
-const response=await fetch("/api/chat",{
-
-method:"POST",
-
-headers:{
-"Content-Type":"application/json"
-},
-
-body:JSON.stringify({
-messages:messages
-})
-
-});
-
-if(!response.ok){
-
-throw new Error("AI request failed");
-
-}
-
-const data=await response.json();
-
-const answer=
-data.answer||
-"Sorry, I couldn't answer that.";
-
-messages.push({
-
-role:"assistant",
-content:answer
-
-});
-
-/*
-  Also put it into normal chat history
-  without opening the chat screen.
-*/
-
-saveChat(text);
-
-/*
-  Speak immediately.
-*/
-
-voiceStatus.textContent=
-"Speaking…";
-
-setGlobe("speaking");
-
-await speak(answer);
-
-voiceStatus.textContent=
-"Tap the microphone";
-
-setGlobe("");
-
-}catch(error){
-
-console.error(error);
-
-voiceStatus.textContent=
-"Something went wrong";
-
-setGlobe("");
+    }
+  );
 
 }
 
-voiceBusy=false;
+imageInput.onchange =
+  async () => {
+
+    for(
+      const file of imageInput.files
+    ){
+
+      if(
+        !file.type.startsWith("image/")
+      ){
+        continue;
+      }
+
+      if(
+        file.size >
+        10 * 1024 * 1024
+      ){
+
+        alert(
+          "Image must be under 10 MB."
+        );
+
+        continue;
+      }
+
+      selectedFiles.push({
+        type:"image",
+        name:file.name,
+        mime:file.type,
+        data:
+          await fileToDataURL(file)
+      });
+
+    }
+
+    imageInput.value = "";
+
+    renderAttachments();
+
+  };
+
+pdfInput.onchange =
+  async () => {
+
+    const file =
+      pdfInput.files[0];
+
+    if(!file){
+      return;
+    }
+
+    if(
+      file.size >
+      20 * 1024 * 1024
+    ){
+
+      alert(
+        "PDF must be under 20 MB."
+      );
+
+      pdfInput.value = "";
+
+      return;
+    }
+
+    selectedFiles.push({
+      type:"pdf",
+      name:file.name,
+      mime:"application/pdf",
+      data:
+        await fileToDataURL(file)
+    });
+
+    pdfInput.value = "";
+
+    renderAttachments();
+
+  };
+
+function renderAttachments(){
+
+  if(!selectedFiles.length){
+
+    attachments.style.display =
+      "none";
+
+    attachments.innerHTML = "";
+
+    return;
+  }
+
+  attachments.style.display =
+    "flex";
+
+  attachments.innerHTML =
+    selectedFiles
+      .map((file,i) => {
+
+        if(file.type === "image"){
+
+          return `
+            <div class="attachment">
+              <img src="${file.data}">
+              <button
+                class="remove"
+                onclick="removeFile(${i})"
+              >
+                ×
+              </button>
+            </div>
+          `;
+
+        }
+
+        return `
+          <div class="attachment">
+            <div class="pdf-preview">
+              <span>📄</span>
+              <span class="pdf-name">
+                ${escapeHtml(file.name)}
+              </span>
+            </div>
+
+            <button
+              class="remove"
+              onclick="removeFile(${i})"
+            >
+              ×
+            </button>
+          </div>
+        `;
+
+      })
+      .join("");
 
 }
 
-/* ---------- SPEECH ---------- */
+function removeFile(i){
 
-function getVoice(){
+  selectedFiles.splice(i,1);
 
-const voices=
-speechSynthesis.getVoices();
-
-const english=
-voices.filter(v=>
-/^en(-|_)/i.test(v.lang)
-);
-
-const preferred=[
-
-"Daniel",
-"Alex",
-"Aaron",
-"Arthur",
-"Google UK English Male",
-"Microsoft David",
-"Microsoft Mark",
-"Microsoft Guy"
-
-];
-
-for(const name of preferred){
-
-const found=
-english.find(v=>
-v.name.toLowerCase()
-.includes(name.toLowerCase())
-);
-
-if(found){
-return found;
-}
+  renderAttachments();
 
 }
 
-return english[0]||null;
+/* =========================================================
+   NORMAL CHAT
+========================================================= */
+
+async function sendMessage(){
+
+  const text =
+    input.value.trim();
+
+  if(
+    (!text && !selectedFiles.length) ||
+    normalBusy
+  ){
+    return;
+  }
+
+  normalBusy = true;
+  send.disabled = true;
+
+  const files =
+    [...selectedFiles];
+
+  input.value = "";
+  input.style.height = "auto";
+
+  const content =
+    text ||
+    "Please analyze the attached file.";
+
+  messages.push({
+    role:"user",
+    content,
+    attachments:files
+  });
+
+  addMessage(
+    "user",
+    content,
+    files
+  );
+
+  selectedFiles = [];
+
+  renderAttachments();
+
+  const thinking =
+    addMessage(
+      "assistant",
+      ""
+    );
+
+  thinking.querySelector(
+    ".bubble"
+  ).innerHTML =
+    `<span style="color:#8d8794">
+      Thinking…
+    </span>`;
+
+  try{
+
+    const response =
+      await fetch(
+        "/api/chat",
+        {
+          method:"POST",
+          headers:{
+            "Content-Type":
+              "application/json"
+          },
+          body:
+            JSON.stringify({
+              messages
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if(!response.ok){
+      throw new Error(
+        data.answer ||
+        "AI request failed"
+      );
+    }
+
+    const answer =
+      data.answer ||
+      "No answer returned.";
+
+    thinking.querySelector(
+      ".bubble"
+    ).textContent =
+      answer;
+
+    messages.push({
+      role:"assistant",
+      content:answer
+    });
+
+    saveChat(
+      content
+    );
+
+    statusBadge.textContent =
+      "Connected";
+
+  }catch(error){
+
+    console.error(error);
+
+    thinking.querySelector(
+      ".bubble"
+    ).textContent =
+      "Sorry, I couldn't process that right now.";
+
+    statusBadge.textContent =
+      "Connection issue";
+
+  }finally{
+
+    normalBusy = false;
+    send.disabled = false;
+
+  }
 
 }
 
-function speak(text){
+/* =========================================================
+   VOICE OPEN/CLOSE
+========================================================= */
 
-return new Promise(resolve=>{
+function openVoice(){
 
-speechSynthesis.cancel();
+  voiceOverlay.classList.add(
+    "active"
+  );
 
-const u=
-new SpeechSynthesisUtterance(text);
+  voiceStatus.textContent =
+    "Tap the microphone";
 
-u.lang="en-US";
-
-u.rate=1;
-
-u.pitch=.88;
-
-const voice=getVoice();
-
-if(voice){
-u.voice=voice;
-}
-
-u.onend=()=>{
-
-setGlobe("");
-
-resolve();
-
-};
-
-u.onerror=()=>{
-
-setGlobe("");
-
-resolve();
-
-};
-
-speechSynthesis.speak(u);
-
-});
+  setGlobe("");
 
 }
 
-/* ---------- HISTORY ---------- */
+async function closeVoice(){
+
+  await stopLiveVoice();
+
+  voiceOverlay.classList.remove(
+    "active"
+  );
+
+  setGlobe("");
+
+  voiceStatus.textContent =
+    "Tap the microphone";
+
+}
+
+async function toggleLiveVoice(){
+
+  if(liveRunning){
+
+    await stopLiveVoice();
+
+    return;
+  }
+
+  await startLiveVoice();
+
+}
+
+/* =========================================================
+   LIVE TOKEN
+========================================================= */
+
+async function getLiveToken(){
+
+  const response =
+    await fetch(
+      "/api/live-token",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+        body:"{}"
+      }
+    );
+
+  const data =
+    await response.json();
+
+  if(
+    !response.ok ||
+    !data.token
+  ){
+
+    throw new Error(
+      data.error ||
+      "Could not create voice session."
+    );
+  }
+
+  return data.token;
+
+}
+
+/* =========================================================
+   LIVE AUDIO CONTEXT
+========================================================= */
+
+async function createAudioInput(){
+
+  liveAudioContext =
+    new (
+      window.AudioContext ||
+      window.webkitAudioContext
+    )({
+      sampleRate:16000
+    });
+
+  await liveAudioContext.resume();
+
+  liveStream =
+    await navigator.mediaDevices.getUserMedia({
+      audio:{
+        channelCount:1,
+        echoCancellation:true,
+        noiseSuppression:true,
+        autoGainControl:true
+      }
+    });
+
+  liveSource =
+    liveAudioContext.createMediaStreamSource(
+      liveStream
+    );
+
+  /*
+    ScriptProcessor is intentionally used here
+    because it has broad Safari + Android support.
+  */
+
+  liveProcessor =
+    liveAudioContext.createScriptProcessor(
+      4096,
+      1,
+      1
+    );
+
+  liveProcessor.onaudioprocess =
+    event => {
+
+      if(
+        !liveSocket ||
+        liveSocket.readyState !==
+          WebSocket.OPEN ||
+        !liveRunning
+      ){
+        return;
+      }
+
+      const inputData =
+        event.inputBuffer.getChannelData(0);
+
+      const pcm =
+        floatTo16BitPCM(
+          inputData
+        );
+
+      const base64 =
+        arrayBufferToBase64(
+          pcm.buffer
+        );
+
+      const message = {
+        realtimeInput:{
+          audio:{
+            mimeType:
+              "audio/pcm;rate=16000",
+            data:base64
+          }
+        }
+      };
+
+      try{
+
+        liveSocket.send(
+          JSON.stringify(message)
+        );
+
+      }catch(error){
+
+        console.error(
+          "Audio send error:",
+          error
+        );
+
+      }
+
+    };
+
+  liveSource.connect(
+    liveProcessor
+  );
+
+  liveProcessor.connect(
+    liveAudioContext.destination
+  );
+
+}
+
+/* =========================================================
+   PCM HELPERS
+========================================================= */
+
+function floatTo16BitPCM(float32){
+
+  const output =
+    new Int16Array(
+      float32.length
+    );
+
+  for(
+    let i=0;
+    i<float32.length;
+    i++
+  ){
+
+    const s =
+      Math.max(
+        -1,
+        Math.min(
+          1,
+          float32[i]
+        )
+      );
+
+    output[i] =
+      s < 0
+        ? s * 0x8000
+        : s * 0x7fff;
+
+  }
+
+  return output;
+
+}
+
+function arrayBufferToBase64(buffer){
+
+  const bytes =
+    new Uint8Array(buffer);
+
+  let binary = "";
+
+  const chunk = 0x8000;
+
+  for(
+    let i=0;
+    i<bytes.length;
+    i+=chunk
+  ){
+
+    binary += String.fromCharCode(
+      ...bytes.subarray(
+        i,
+        Math.min(
+          i + chunk,
+          bytes.length
+        )
+      )
+    );
+
+  }
+
+  return btoa(binary);
+
+}
+
+function base64ToUint8Array(base64){
+
+  const binary =
+    atob(base64);
+
+  const bytes =
+    new Uint8Array(
+      binary.length
+    );
+
+  for(
+    let i=0;
+    i<binary.length;
+    i++
+  ){
+
+    bytes[i] =
+      binary.charCodeAt(i);
+
+  }
+
+  return bytes;
+
+}
+
+/* =========================================================
+   LIVE AUDIO PLAYBACK
+========================================================= */
+
+async function setupPlayback(){
+
+  if(!liveAudioContext){
+
+    liveAudioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+  }
+
+  await liveAudioContext.resume();
+
+  playbackTime =
+    Math.max(
+      playbackTime,
+      liveAudioContext.currentTime
+    );
+
+}
+
+function pcm16ToFloat32(
+  bytes
+){
+
+  const view =
+    new DataView(
+      bytes.buffer,
+      bytes.byteOffset,
+      bytes.byteLength
+    );
+
+  const samples =
+    Math.floor(
+      bytes.byteLength / 2
+    );
+
+  const float32 =
+    new Float32Array(
+      samples
+    );
+
+  for(
+    let i=0;
+    i<samples;
+    i++
+  ){
+
+    const sample =
+      view.getInt16(
+        i * 2,
+        true
+      );
+
+    float32[i] =
+      sample / 32768;
+
+  }
+
+  return float32;
+
+}
+
+async function playPCM24k(
+  base64
+){
+
+  if(!liveAudioContext){
+    return;
+  }
+
+  await liveAudioContext.resume();
+
+  const bytes =
+    base64ToUint8Array(
+      base64
+    );
+
+  if(!bytes.length){
+    return;
+  }
+
+  const samples =
+    pcm16ToFloat32(
+      bytes
+    );
+
+  const buffer =
+    liveAudioContext.createBuffer(
+      1,
+      samples.length,
+      24000
+    );
+
+  buffer.copyToChannel(
+    samples,
+    0
+  );
+
+  const source =
+    liveAudioContext.createBufferSource();
+
+  source.buffer =
+    buffer;
+
+  source.connect(
+    liveAudioContext.destination
+  );
+
+  const now =
+    liveAudioContext.currentTime;
+
+  playbackTime =
+    Math.max(
+      playbackTime,
+      now
+    );
+
+  source.start(
+    playbackTime
+  );
+
+  playbackTime +=
+    buffer.duration;
+
+  setGlobe("speaking");
+
+  voiceStatus.textContent =
+    "Speaking…";
+
+}
+
+/* =========================================================
+   GEMINI LIVE WEBSOCKET
+========================================================= */
+
+async function startLiveVoice(){
+
+  if(
+    !navigator.mediaDevices ||
+    !navigator.mediaDevices.getUserMedia
+  ){
+
+    voiceStatus.textContent =
+      "Microphone isn't available.";
+
+    return;
+  }
+
+  if(
+    liveRunning ||
+    liveConnected
+  ){
+    return;
+  }
+
+  liveClosing = false;
+
+  try{
+
+    /*
+      This happens from the user's tap,
+      which is important for iOS audio.
+    */
+
+    liveAudioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+    await liveAudioContext.resume();
+
+    voiceStatus.textContent =
+      "Connecting…";
+
+    setGlobe("thinking");
+
+    liveSessionToken =
+      await getLiveToken();
+
+    const socketUrl =
+      "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=" +
+      encodeURIComponent(
+        liveSessionToken
+      );
+
+    liveSocket =
+      new WebSocket(
+        socketUrl
+      );
+
+    liveSocket.binaryType =
+      "arraybuffer";
+
+    liveSocket.onopen =
+      async () => {
+
+        if(liveClosing){
+          return;
+        }
+
+        const setup = {
+          setup:{
+            model:
+              "models/gemini-3.8-live",
+
+            generationConfig:{
+              responseModalities:[
+                "AUDIO"
+              ]
+            },
+
+            systemInstruction:{
+              parts:[
+                {
+                  text:
+                    `
+You are the voice assistant for Ask Anything AI.
+
+Speak naturally and clearly.
+
+Be accurate.
+Never invent information.
+If you are uncertain, say so.
+Answer directly without unnecessary introductions.
+Keep responses reasonably concise for voice conversation.
+`
+                }
+              ]
+            },
+
+            inputAudioTranscription:{},
+
+            outputAudioTranscription:{},
+
+            sessionResumption:{}
+          }
+        };
+
+        liveSocket.send(
+          JSON.stringify(setup)
+        );
+
+        liveConnected = true;
+        liveRunning = true;
+
+        voiceMic.classList.add(
+          "active"
+        );
+
+        voiceStatus.textContent =
+          "Listening…";
+
+        setGlobe("listening");
+
+        try{
+
+          await createAudioInput();
+
+        }catch(error){
+
+          console.error(
+            "Microphone error:",
+            error
+          );
+
+          voiceStatus.textContent =
+            "Microphone permission required.";
+
+          await stopLiveVoice();
+
+        }
+
+      };
+
+    liveSocket.onmessage =
+      async event => {
+
+        try{
+
+          const response =
+            JSON.parse(
+              event.data
+            );
+
+          const serverContent =
+            response.serverContent;
+
+          if(!serverContent){
+            return;
+          }
+
+          if(
+            serverContent.interrupted
+          ){
+
+            stopQueuedPlayback();
+
+            voiceStatus.textContent =
+              "Listening…";
+
+            setGlobe(
+              "listening"
+            );
+
+            return;
+          }
+
+          const modelTurn =
+            serverContent.modelTurn;
+
+          if(modelTurn?.parts){
+
+            for(
+              const part
+              of modelTurn.parts
+            ){
+
+              const audio =
+                part.inlineData ||
+                part.inline_data;
+
+              if(
+                audio &&
+                audio.data
+              ){
+
+                await playPCM24k(
+                  audio.data
+                );
+
+              }
+
+            }
+
+          }
+
+          if(
+            serverContent.turnComplete
+          ){
+
+            if(
+              !playbackIsActive()
+            ){
+
+              voiceStatus.textContent =
+                "Listening…";
+
+              setGlobe(
+                "listening"
+              );
+
+            }
+
+          }
+
+        }catch(error){
+
+          console.error(
+            "Live message error:",
+            error
+          );
+
+        }
+
+      };
+
+    liveSocket.onerror =
+      error => {
+
+        console.error(
+          "Live socket error:",
+          error
+        );
+
+        voiceStatus.textContent =
+          "Voice connection error.";
+
+      };
+
+    liveSocket.onclose =
+      event => {
+
+        console.log(
+          "Live socket closed:",
+          event.code,
+          event.reason
+        );
+
+        liveConnected = false;
+        liveRunning = false;
+
+        voiceMic.classList.remove(
+          "active"
+        );
+
+        if(!liveClosing){
+
+          voiceStatus.textContent =
+            "Connection closed";
+
+          setGlobe("");
+
+        }
+
+      };
+
+  }catch(error){
+
+    console.error(
+      "Start voice error:",
+      error
+    );
+
+    voiceStatus.textContent =
+      error.message ||
+      "Couldn't start voice mode.";
+
+    setGlobe("");
+
+    await stopLiveVoice();
+
+  }
+
+}
+
+/* =========================================================
+   PLAYBACK STATE
+========================================================= */
+
+function playbackIsActive(){
+
+  if(!liveAudioContext){
+    return false;
+  }
+
+  return (
+    playbackTime >
+    liveAudioContext.currentTime + 0.05
+  );
+
+}
+
+function stopQueuedPlayback(){
+
+  playbackTime =
+    liveAudioContext
+      ? liveAudioContext.currentTime
+      : 0;
+
+}
+
+/* =========================================================
+   STOP LIVE VOICE
+========================================================= */
+
+async function stopLiveVoice(){
+
+  liveClosing = true;
+  liveRunning = false;
+  liveConnected = false;
+
+  voiceMic.classList.remove(
+    "active"
+  );
+
+  if(liveProcessor){
+
+    try{
+      liveProcessor.disconnect();
+    }catch(e){}
+
+    liveProcessor.onaudioprocess =
+      null;
+
+    liveProcessor = null;
+
+  }
+
+  if(liveSource){
+
+    try{
+      liveSource.disconnect();
+    }catch(e){}
+
+    liveSource = null;
+
+  }
+
+  if(liveStream){
+
+    for(
+      const track
+      of liveStream.getTracks()
+    ){
+
+      track.stop();
+
+    }
+
+    liveStream = null;
+
+  }
+
+  if(liveSocket){
+
+    try{
+
+      if(
+        liveSocket.readyState ===
+        WebSocket.OPEN
+      ){
+
+        liveSocket.close(
+          1000,
+          "User closed voice mode"
+        );
+
+      }
+
+    }catch(e){}
+
+    liveSocket = null;
+
+  }
+
+  if(liveAudioContext){
+
+    try{
+      await liveAudioContext.close();
+    }catch(e){}
+
+    liveAudioContext = null;
+
+  }
+
+  playbackTime = 0;
+
+  setGlobe("");
+
+  liveSessionToken = null;
+
+}
+
+/* =========================================================
+   HISTORY
+========================================================= */
 
 function saveChat(title){
 
-if(!messages.length){
-return;
-}
+  if(!messages.length){
+    return;
+  }
 
-const clean=
-messages.map(m=>({
+  const clean =
+    messages.map(m => ({
+      role:m.role,
+      content:m.content
+    }));
 
-role:m.role,
-content:m.content
+  chats.push({
+    title:String(title).slice(0,42),
+    messages:clean
+  });
 
-}));
+  chats =
+    chats.slice(-20);
 
-chats.push({
+  localStorage.setItem(
+    "ask-anything-chats",
+    JSON.stringify(chats)
+  );
 
-title:title.slice(0,42),
-messages:clean
-
-});
-
-chats=chats.slice(-20);
-
-localStorage.setItem(
-"ask-anything-chats",
-JSON.stringify(chats)
-);
-
-renderHistory();
+  renderHistory();
 
 }
 
 function renderHistory(){
 
-document.getElementById("history").innerHTML=
-chats
-.slice(-12)
-.reverse()
-.map((x,i)=>`
+  const history =
+    document.getElementById(
+      "history"
+    );
 
-<div
-class="chat-item"
-onclick="loadChat(${chats.length-1-i})"
->
-${escapeHtml(x.title)}
-</div>
-
-`)
-.join("");
+  history.innerHTML =
+    chats
+      .slice(-12)
+      .reverse()
+      .map(
+        (x,i) => `
+          <div
+            class="chat-item"
+            onclick="loadChat(${chats.length - 1 - i})"
+          >
+            ${escapeHtml(x.title)}
+          </div>
+        `
+      )
+      .join("");
 
 }
 
 function loadChat(i){
 
-const c=chats[i];
+  const c =
+    chats[i];
 
-if(!c){
-return;
+  if(!c){
+    return;
+  }
+
+  messages =
+    c.messages || [];
+
+  chat.innerHTML = "";
+
+  for(
+    const m
+    of messages
+  ){
+
+    addMessage(
+      m.role,
+      m.content
+    );
+
+  }
+
 }
 
-messages=c.messages||[];
+/* =========================================================
+   INPUT
+========================================================= */
 
-chat.innerHTML="";
+input.addEventListener(
+  "keydown",
+  event => {
 
-for(const m of messages){
+    if(
+      event.key === "Enter" &&
+      !event.shiftKey
+    ){
 
-addMessage(
-m.role,
-m.content
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
 );
 
-}
+input.addEventListener(
+  "input",
+  () => {
 
-}
+    input.style.height =
+      "auto";
 
-/* ---------- INPUT ---------- */
+    input.style.height =
+      Math.min(
+        input.scrollHeight,
+        150
+      ) + "px";
 
-input.addEventListener("keydown",e=>{
+  }
+);
 
-if(
-e.key==="Enter"&&!e.shiftKey
-){
-
-e.preventDefault();
-
-sendMessage();
-
-}
-
-});
-
-input.addEventListener("input",()=>{
-
-input.style.height="auto";
-
-input.style.height=
-Math.min(
-input.scrollHeight,
-150
-)+"px";
-
-});
-
-if("speechSynthesis" in window){
-
-speechSynthesis.onvoiceschanged=()=>{
-speechSynthesis.getVoices();
-};
-
-}
+/* =========================================================
+   START
+========================================================= */
 
 renderHistory();
 
