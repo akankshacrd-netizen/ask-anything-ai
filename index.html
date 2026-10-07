@@ -5,6 +5,7 @@
 <meta name="viewport"
       content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>Ask Anything AI</title>
+<meta name="application-name" content="Ask Anything AI">
 
 <style>
 *{
@@ -778,6 +779,8 @@ let playbackTime = 0;
 let liveSessionToken = null;
 
 const audioQueue = [];
+const activePlaybackSources = new Set();
+let playbackTimer = null;
 
 /* =========================================================
    HELPERS
@@ -1297,25 +1300,23 @@ async function getLiveToken(){
 
 async function createAudioInput(){
 
-  liveAudioContext =
-    new (
-      window.AudioContext ||
-      window.webkitAudioContext
-    )({
-      sampleRate:16000
-    });
+  if(!liveAudioContext){
+    throw new Error("Audio is not ready. Please try again.");
+  }
 
   await liveAudioContext.resume();
 
-  liveStream =
-    await navigator.mediaDevices.getUserMedia({
-      audio:{
-        channelCount:1,
-        echoCancellation:true,
-        noiseSuppression:true,
-        autoGainControl:true
-      }
-    });
+  if(!liveStream){
+    liveStream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:{
+          channelCount:1,
+          echoCancellation:true,
+          noiseSuppression:true,
+          autoGainControl:true
+        }
+      });
+  }
 
   liveSource =
     liveAudioContext.createMediaStreamSource(
@@ -1323,96 +1324,117 @@ async function createAudioInput(){
     );
 
   /*
-    ScriptProcessor is intentionally used here
-    because it has broad Safari + Android support.
+    ScriptProcessorNode is used for broad Safari + Android
+    compatibility. The unlocked AudioContext created from
+    the microphone button is reused for both input and output.
   */
-
   liveProcessor =
     liveAudioContext.createScriptProcessor(
-      4096,
+      2048,
       1,
       1
     );
 
-  liveProcessor.onaudioprocess =
-    event => {
+  liveProcessor.onaudioprocess = event => {
 
-      if(
-        !liveSocket ||
-        liveSocket.readyState !==
-          WebSocket.OPEN ||
-        !liveRunning
-      ){
-        return;
-      }
+    if(
+      !liveSocket ||
+      liveSocket.readyState !== WebSocket.OPEN ||
+      !liveRunning
+    ){
+      return;
+    }
 
-      const inputData =
-        event.inputBuffer.getChannelData(0);
+    const inputData =
+      event.inputBuffer.getChannelData(0);
 
-      const pcm =
-        floatTo16BitPCM(
-          inputData
-        );
+    const sourceRate =
+      event.inputBuffer.sampleRate ||
+      liveAudioContext.sampleRate ||
+      16000;
 
-      const base64 =
-        arrayBufferToBase64(
-          pcm.buffer
-        );
+    const pcmSamples =
+      sourceRate === 16000
+        ? inputData
+        : resampleTo16k(inputData, sourceRate);
 
-      const message = {
-        realtimeInput:{
-          audio:{
-            mimeType:
-              "audio/pcm;rate=16000",
-            data:base64
+    const pcm =
+      floatTo16BitPCM(pcmSamples);
+
+    const base64 =
+      arrayBufferToBase64(pcm.buffer);
+
+    try{
+
+      liveSocket.send(
+        JSON.stringify({
+          realtimeInput:{
+            audio:{
+              mimeType:"audio/pcm;rate=16000",
+              data:base64
+            }
           }
-        }
-      };
+        })
+      );
 
-      try{
+    }catch(error){
 
-        liveSocket.send(
-          JSON.stringify(message)
-        );
+      console.error(
+        "Audio send error:",
+        error
+      );
 
-      }catch(error){
+    }
 
-        console.error(
-          "Audio send error:",
-          error
-        );
+  };
 
-      }
+  liveSource.connect(liveProcessor);
 
-    };
-
-  liveSource.connect(
-    liveProcessor
-  );
-
-  /*
-    ScriptProcessorNode must be connected to keep processing
-    reliably in Safari, but its output should be silent so
-    the microphone is not played back into the speaker.
-  */
+  /* Keep ScriptProcessor running without audible mic feedback. */
   const silentGain =
     liveAudioContext.createGain();
 
   silentGain.gain.value = 0;
 
-  liveProcessor.connect(
-    silentGain
-  );
-
-  silentGain.connect(
-    liveAudioContext.destination
-  );
+  liveProcessor.connect(silentGain);
+  silentGain.connect(liveAudioContext.destination);
 
 }
 
 /* =========================================================
    PCM HELPERS
 ========================================================= */
+
+function resampleTo16k(input, sourceRate){
+
+  if(sourceRate === 16000){
+    return input;
+  }
+
+  const ratio = sourceRate / 16000;
+  const outputLength = Math.max(
+    1,
+    Math.round(input.length / ratio)
+  );
+
+  const output = new Float32Array(outputLength);
+
+  for(let i=0; i<outputLength; i++){
+
+    const position = i * ratio;
+    const left = Math.floor(position);
+    const right = Math.min(left + 1, input.length - 1);
+    const fraction = position - left;
+
+    output[i] =
+      input[left] * (1 - fraction) +
+      input[right] * fraction;
+
+  }
+
+  return output;
+
+}
 
 function floatTo16BitPCM(float32){
 
@@ -1571,9 +1593,7 @@ function pcm16ToFloat32(
 
 }
 
-async function playPCM24k(
-  base64
-){
+async function playPCM24k(base64){
 
   if(!liveAudioContext){
     return;
@@ -1582,18 +1602,14 @@ async function playPCM24k(
   await liveAudioContext.resume();
 
   const bytes =
-    base64ToUint8Array(
-      base64
-    );
+    base64ToUint8Array(base64);
 
   if(!bytes.length){
     return;
   }
 
   const samples =
-    pcm16ToFloat32(
-      bytes
-    );
+    pcm16ToFloat32(bytes);
 
   const buffer =
     liveAudioContext.createBuffer(
@@ -1602,41 +1618,56 @@ async function playPCM24k(
       24000
     );
 
-  buffer.copyToChannel(
-    samples,
-    0
-  );
+  buffer.copyToChannel(samples, 0);
 
   const source =
     liveAudioContext.createBufferSource();
 
-  source.buffer =
-    buffer;
+  source.buffer = buffer;
+  source.connect(liveAudioContext.destination);
 
-  source.connect(
-    liveAudioContext.destination
+  activePlaybackSources.add(source);
+
+  source.onended = () => {
+    activePlaybackSources.delete(source);
+
+    if(
+      liveRunning &&
+      activePlaybackSources.size === 0 &&
+      playbackTimer === null
+    ){
+      const delay = Math.max(
+        0,
+        (playbackTime - liveAudioContext.currentTime) * 1000
+      );
+
+      playbackTimer = setTimeout(() => {
+        playbackTimer = null;
+
+        if(
+          liveRunning &&
+          activePlaybackSources.size === 0
+        ){
+          voiceStatus.textContent = "Listening…";
+          setGlobe("listening");
+        }
+      }, Math.min(delay + 30, 2000));
+    }
+  };
+
+  const now = liveAudioContext.currentTime;
+
+  playbackTime = Math.max(
+    playbackTime,
+    now
   );
 
-  const now =
-    liveAudioContext.currentTime;
+  source.start(playbackTime);
 
-  playbackTime =
-    Math.max(
-      playbackTime,
-      now
-    );
+  playbackTime += buffer.duration;
 
-  source.start(
-    playbackTime
-  );
-
-  playbackTime +=
-    buffer.duration;
-
+  voiceStatus.textContent = "Speaking…";
   setGlobe("speaking");
-
-  voiceStatus.textContent =
-    "Speaking…";
 
 }
 
@@ -1657,10 +1688,7 @@ async function startLiveVoice(){
     return;
   }
 
-  if(
-    liveRunning ||
-    liveConnected
-  ){
+  if(liveRunning || liveConnected){
     return;
   }
 
@@ -1669,308 +1697,255 @@ async function startLiveVoice(){
   try{
 
     /*
-      This happens from the user's tap,
-      which is important for iOS audio.
+      Create and unlock ONE audio context directly from the
+      microphone button. Reusing it is important for iOS Safari.
     */
-
     liveAudioContext =
       new (
         window.AudioContext ||
         window.webkitAudioContext
-      )();
+      )({
+        sampleRate:16000,
+        latencyHint:"interactive"
+      });
 
     await liveAudioContext.resume();
 
-    voiceStatus.textContent =
-      "Connecting…";
-
+    voiceStatus.textContent = "Requesting microphone…";
     setGlobe("thinking");
+
+    /* Ask for microphone permission while still in the tap flow. */
+    liveStream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:{
+          channelCount:1,
+          echoCancellation:true,
+          noiseSuppression:true,
+          autoGainControl:true
+        }
+      });
+
+    await liveAudioContext.resume();
+
+    voiceStatus.textContent = "Connecting…";
 
     liveSessionToken =
       await getLiveToken();
 
     const socketUrl =
       "wss://generativelanguage.googleapis.com/ws/google.ai.generativelanguage.v1beta.GenerativeService.BidiGenerateContentConstrained?access_token=" +
-      encodeURIComponent(
-        liveSessionToken
-      );
+      encodeURIComponent(liveSessionToken);
 
     liveSocket =
-      new WebSocket(
-        socketUrl
-      );
+      new WebSocket(socketUrl);
 
-    liveSocket.binaryType =
-      "arraybuffer";
+    liveSocket.binaryType = "arraybuffer";
 
-    liveSocket.onopen =
-      async () => {
+    liveSocket.onopen = () => {
 
-        if(liveClosing){
+      if(liveClosing){
+        return;
+      }
+
+      const setup = {
+        setup:{
+          model:"models/gemini-3.8-live",
+
+          /*
+            Gemini's native-audio Live WebSocket protocol expects
+            responseModalities inside generationConfig here.
+          */
+          generationConfig:{
+            responseModalities:["AUDIO"],
+            speechConfig:{
+              voiceConfig:{
+                prebuiltVoiceConfig:{
+                  voiceName:"Puck"
+                }
+              }
+            }
+          },
+
+          systemInstruction:{
+            parts:[
+              {
+                text:
+                  "You are the voice assistant for Ask Anything AI. " +
+                  "Speak naturally and clearly. Be accurate and never " +
+                  "invent information. If uncertain, say so. Answer " +
+                  "directly and keep responses reasonably concise for voice conversation."
+              }
+            ]
+          }
+        }
+      };
+
+      try{
+        liveSocket.send(JSON.stringify(setup));
+      }catch(error){
+        console.error("Live setup send error:", error);
+      }
+
+      voiceStatus.textContent = "Connecting…";
+      setGlobe("thinking");
+
+    };
+
+    liveSocket.onmessage = async event => {
+
+      try{
+
+        const response =
+          JSON.parse(event.data);
+
+        if(response.setupComplete){
+
+          liveConnected = true;
+          liveRunning = true;
+
+          voiceMic.classList.add("active");
+          voiceStatus.textContent = "Listening…";
+          setGlobe("listening");
+
+          try{
+            await createAudioInput();
+          }catch(error){
+
+            console.error(
+              "Microphone processing error:",
+              error
+            );
+
+            voiceStatus.textContent =
+              "Microphone permission required.";
+
+            await stopLiveVoice();
+          }
+
           return;
         }
 
-        const setup = {
-          setup:{
-            model:
-              "models/gemini-3.8-live",
-
-            responseModalities:[
-              "AUDIO"
-            ],
-
-            systemInstruction:{
-              parts:[
-                {
-                  text:
-                    `
-You are the voice assistant for Ask Anything AI.
-
-Speak naturally and clearly.
-
-Be accurate.
-Never invent information.
-If you are uncertain, say so.
-Answer directly without unnecessary introductions.
-Keep responses reasonably concise for voice conversation.
-`
-                }
-              ]
-            },
-
-            /*
-              Keep the first setup message minimal for maximum
-              Safari/Android compatibility. We can add
-              transcription and session resumption after the
-              basic audio session is working.
-            */
-          }
-        };
-
-        liveSocket.send(
-          JSON.stringify(setup)
-        );
-
-        liveConnected = true;
-
-        /*
-          Do not start sending microphone audio until
-          Gemini confirms that the Live setup is complete.
-          This is especially important for Safari.
-        */
-
-        voiceStatus.textContent =
-          "Connecting…";
-
-        setGlobe("thinking");
-
-      };
-
-    liveSocket.onmessage =
-      async event => {
-
-        try{
-
-          const response =
-            JSON.parse(
-              event.data
-            );
-
-          /*
-            Gemini confirms the Live configuration with
-            setupComplete. Only then do we start the
-            microphone stream.
-          */
-          if(response.setupComplete){
-
-            liveRunning = true;
-
-            voiceMic.classList.add(
-              "active"
-            );
-
-            voiceStatus.textContent =
-              "Listening…";
-
-            setGlobe("listening");
-
-            try{
-
-              await createAudioInput();
-
-            }catch(error){
-
-              console.error(
-                "Microphone error:",
-                error
-              );
-
-              voiceStatus.textContent =
-                "Microphone permission required.";
-
-              await stopLiveVoice();
-
-            }
-
-            return;
-          }
-
-          if(response.error){
-
-            console.error(
-              "Gemini Live error:",
-              response.error
-            );
-
-            const errorMessage =
-              response.error.message ||
-              response.error.status ||
-              "Voice connection error.";
-
-            voiceStatus.textContent =
-              errorMessage;
-
-            setGlobe("");
-
-            return;
-          }
-
-          const serverContent =
-            response.serverContent;
-
-          if(!serverContent){
-            return;
-          }
-
-          if(
-            serverContent.interrupted
-          ){
-
-            stopQueuedPlayback();
-
-            voiceStatus.textContent =
-              "Listening…";
-
-            setGlobe(
-              "listening"
-            );
-
-            return;
-          }
-
-          const modelTurn =
-            serverContent.modelTurn;
-
-          if(modelTurn?.parts){
-
-            for(
-              const part
-              of modelTurn.parts
-            ){
-
-              const audio =
-                part.inlineData ||
-                part.inline_data;
-
-              if(
-                audio &&
-                audio.data
-              ){
-
-                await playPCM24k(
-                  audio.data
-                );
-
-              }
-
-            }
-
-          }
-
-          if(
-            serverContent.turnComplete
-          ){
-
-            if(
-              !playbackIsActive()
-            ){
-
-              voiceStatus.textContent =
-                "Listening…";
-
-              setGlobe(
-                "listening"
-              );
-
-            }
-
-          }
-
-        }catch(error){
+        if(response.error){
 
           console.error(
-            "Live message error:",
-            error
+            "Gemini Live error:",
+            response.error
           );
+
+          voiceStatus.textContent =
+            response.error.message ||
+            response.error.status ||
+            "Voice connection error.";
+
+          setGlobe("");
+          return;
+        }
+
+        const serverContent =
+          response.serverContent;
+
+        if(!serverContent){
+          return;
+        }
+
+        if(serverContent.interrupted){
+
+          stopQueuedPlayback();
+
+          if(liveRunning){
+            voiceStatus.textContent = "Listening…";
+            setGlobe("listening");
+          }
+
+          return;
+        }
+
+        const modelTurn =
+          serverContent.modelTurn;
+
+        if(modelTurn?.parts){
+
+          for(const part of modelTurn.parts){
+
+            const audio =
+              part.inlineData ||
+              part.inline_data;
+
+            if(audio?.data){
+              await playPCM24k(audio.data);
+            }
+
+          }
+        }
+
+        if(serverContent.turnComplete){
+
+          if(
+            !playbackIsActive() &&
+            activePlaybackSources.size === 0
+          ){
+            voiceStatus.textContent = "Listening…";
+            setGlobe("listening");
+          }
 
         }
 
-      };
-
-    liveSocket.onerror =
-      error => {
+      }catch(error){
 
         console.error(
-          "Live socket error:",
+          "Live message error:",
           error
         );
 
+      }
+
+    };
+
+    liveSocket.onerror = error => {
+
+      console.error(
+        "Live socket error:",
+        error
+      );
+
+      if(!liveClosing){
         voiceStatus.textContent =
           "Voice connection error.";
+      }
 
-      };
+    };
 
-    liveSocket.onclose =
-      event => {
+    liveSocket.onclose = event => {
 
-        console.log(
-          "Live socket closed:",
-          event.code,
+      console.log(
+        "Live socket closed:",
+        event.code,
+        event.reason
+      );
+
+      liveConnected = false;
+      liveRunning = false;
+
+      voiceMic.classList.remove("active");
+
+      if(!liveClosing){
+
+        const reason =
           event.reason
-        );
+            ? " — " + event.reason
+            : "";
 
-        liveConnected = false;
-        liveRunning = false;
+        voiceStatus.textContent =
+          "Connection closed (" +
+          event.code +
+          ")" +
+          reason;
 
-        voiceMic.classList.remove(
-          "active"
-        );
+        setGlobe("");
 
-        if(!liveClosing){
+      }
 
-          const reason =
-            event.reason
-              ? " — " + event.reason
-              : "";
-
-          voiceStatus.textContent =
-            "Connection closed (" +
-            event.code +
-            ")" +
-            reason;
-
-          console.error(
-            "Gemini Live closed. Code:",
-            event.code,
-            "Reason:",
-            event.reason || "(none)"
-          );
-
-          setGlobe("");
-
-        }
-
-      };
+    };
 
   }catch(error){
 
@@ -1979,11 +1954,13 @@ Keep responses reasonably concise for voice conversation.
       error
     );
 
-    voiceStatus.textContent =
-      error.message ||
-      "Couldn't start voice mode.";
+    if(!liveClosing){
+      voiceStatus.textContent =
+        error.message ||
+        "Couldn't start voice mode.";
 
-    setGlobe("");
+      setGlobe("");
+    }
 
     await stopLiveVoice();
 
@@ -2003,12 +1980,26 @@ function playbackIsActive(){
 
   return (
     playbackTime >
-    liveAudioContext.currentTime + 0.05
+    liveAudioContext.currentTime + 0.05 ||
+    activePlaybackSources.size > 0
   );
 
 }
 
 function stopQueuedPlayback(){
+
+  for(const source of activePlaybackSources){
+    try{
+      source.stop();
+    }catch(e){}
+  }
+
+  activePlaybackSources.clear();
+
+  if(playbackTimer !== null){
+    clearTimeout(playbackTimer);
+    playbackTimer = null;
+  }
 
   playbackTime =
     liveAudioContext
@@ -2069,6 +2060,8 @@ async function stopLiveVoice(){
 
   }
 
+  stopQueuedPlayback();
+
   if(liveSocket){
 
     try{
@@ -2077,6 +2070,17 @@ async function stopLiveVoice(){
         liveSocket.readyState ===
         WebSocket.OPEN
       ){
+
+        /* Tell the Live API the current audio stream ended before closing. */
+        try{
+          liveSocket.send(
+            JSON.stringify({
+              realtimeInput:{
+                audioStreamEnd:true
+              }
+            })
+          );
+        }catch(e){}
 
         liveSocket.close(
           1000,
