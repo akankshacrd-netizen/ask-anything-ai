@@ -1715,11 +1715,9 @@ async function startLiveVoice(){
             model:
               "models/gemini-3.8-live",
 
-            generationConfig:{
-              responseModalities:[
-                "AUDIO"
-              ]
-            },
+            responseModalities:[
+              "AUDIO"
+            ],
 
             systemInstruction:{
               parts:[
